@@ -20,6 +20,15 @@
   },
   "news": [
     {
+      "id": "17804366817830.14871784721748638",
+      "title": "Gobierno meterá presos a los presos que protesten",
+      "category": "NACIONALES",
+      "excerpt": "La presidenta encargada de Venezuela y figura de acción favorita de Donald Trump, Delcy Rodríguez, anunció este martes que se abrirá una investigación penal en contra la población reclusa que proteste por las violaciones a los derechos humanos en los penales, bajo la severa amenaza de meterlos presos a la cárcel si siguen quejándose de estar presos en la cárcel.\n",
+      "content": "La presidenta encargada de Venezuela y figura de acción favorita de Donald Trump, Delcy Rodríguez, anunció este martes que se abrirá una investigación penal en contra la población reclusa que proteste por las violaciones a los derechos humanos en los penales, bajo la severa amenaza de meterlos presos a la cárcel si siguen quejándose de estar presos en la cárcel.\n\nUn portavoz del Ministerio Público que prefirió mantenerse en anonimato para que no lo pusieran preso también, declaró: “No vamos a tolerar que la anarquía perturbe la paz de nuestros centros de reclusión. Cualquier queja de un privado de libertad debe hacerla por los canales regulares, no destruyendo el mobiliario del pabellón, mobiliario que con tanto esfuerzo sus propias familias tuvieron que contrabandear pieza por pieza los fines de semana.\n\nSí un procesado recibe una paliza, coscorrón o pellizco, eso es jugando y debería disculpar al funcionario que lo hizo porque eso es como se dice por ahí, \"una jodedera\". Es una falta de respeto a la ley y un insulto a la economía del hogar lo que están haciendo algunos penados. A todos los presos que denuncien torturas, requisas, disparos y todas las cosas que hacemos dentro del recinto, ¡los vamos a meter presos! Los trapos sucios se lavan en casa”, concluyó el portavoz mientras se preparaba para leer a los presos los poemas de Tarek William Saab.",
+      "image": "https://images2.imgbox.com/f6/bf/2Rqkzkkz_o.jpg",
+      "date": "2026-06-02T21:44:41.783Z"
+    },
+    {
       "id": "17804313663890.18025626967644748",
       "title": "Hacker UniPro toma el control de cámaras en aspiradoras robot y expone vulnerabilidad masiva",
       "category": "HACKTIVISMO",
@@ -75,5 +84,5 @@
     }
   ],
   "version": "1.0",
-  "exportDate": "2026-06-02T20:18:04.653Z"
+  "exportDate": "2026-06-02T21:45:49.087Z"
 }
