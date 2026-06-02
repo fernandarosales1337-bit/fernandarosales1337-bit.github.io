@@ -535,7 +535,24 @@
         document.getElementById('cardBgColor').value = siteConfig.colors.cardBg;
     }
     
-    function refreshAdminPanelData() {
+    
+function forceReloadAdminData(){
+    const savedConfig = localStorage.getItem(STORAGE_CONFIG);
+    const savedNews = localStorage.getItem(STORAGE_NEWS);
+
+    if(savedConfig){
+        try { siteConfig = JSON.parse(savedConfig); } catch(e){}
+    }
+    if(savedNews){
+        try { newsDatabase = JSON.parse(savedNews); } catch(e){}
+    }
+
+    updateAdminDisplayValues();
+    renderCategoriesInAdmin();
+    renderNewsListInAdmin();
+}
+
+function refreshAdminPanelData() {
         if(document.getElementById('adminPanel').style.display === 'block') {
             updateAdminDisplayValues();
             renderCategoriesInAdmin();
@@ -561,26 +578,31 @@
     // MODAL & EVENTOS
     const modal = document.getElementById('adminModal');
     document.getElementById('footerSecretHint').onclick = () => {
+    forceReloadAdminData();
     modal.style.display = 'flex';
     if(isAdminMode){
-        document.getElementById('authSection').style.display = 'none';
-        document.getElementById('adminPanel').style.display = 'block';
-        refreshAdminPanelData();
+        document.getElementById('authSection').style.display='none';
+        document.getElementById('adminPanel').style.display='block';
+        forceReloadAdminData();
+    }else{
+        document.getElementById('authSection').style.display='block';
+        document.getElementById('adminPanel').style.display='none';
     }
 };
     document.getElementById('closeModalBtn').onclick = () => modal.style.display = 'none';
     window.onclick = (e) => { if(e.target === modal) modal.style.display = 'none'; };
     document.getElementById('loginBtn').onclick = async () => {
-    if(await sha256(document.getElementById('adminPassword').value) === ADMIN_PASSWORD_HASH){
+    if(await sha256(document.getElementById('adminPassword').value) === ADMIN_PASSWORD_HASH) {
+        forceReloadAdminData();
         document.getElementById('authSection').style.display='none';
         document.getElementById('adminPanel').style.display='block';
         setAdminMode(true);
-        refreshAdminPanelData();
+        forceReloadAdminData();
     } else {
         document.getElementById('loginError').innerText="⛔ Clave incorrecta.";
     }
 };
-    document.getElementById('logoutAdminBtn').onclick = logoutAdmin;
+document.getElementById('logoutAdminBtn').onclick = logoutAdmin;
     document.getElementById('updateBrandBtn').onclick = () => { if(document.getElementById('editTitle').value) siteConfig.title = document.getElementById('editTitle').value; if(document.getElementById('editSubtitle').value) siteConfig.subtitle = document.getElementById('editSubtitle').value; saveConfig(); applyBranding(); refreshAdminPanelData(); alert("Título actualizado."); };
     document.getElementById('applyColorsBtn').onclick = () => { siteConfig.colors.headerBg = document.getElementById('headerBgColor').value; siteConfig.colors.accent = document.getElementById('accentColor').value; siteConfig.colors.bodyBg = document.getElementById('bodyBgColor').value; siteConfig.colors.textColor = document.getElementById('textColor').value; siteConfig.colors.cardBg = document.getElementById('cardBgColor').value; saveConfig(); applyColors(); if(currentView === "home") showHome(); alert("Colores actualizados."); };
     document.getElementById('addCategoryBtn').onclick = () => { let newCat = document.getElementById('newCategoryName').value.trim(); if(newCat && !siteConfig.categories.includes(newCat)) { siteConfig.categories.push(newCat); saveConfig(); renderNav(); refreshAdminPanelData(); document.getElementById('newCategoryName').value=''; alert("Categoría agregada."); } else alert("Inválida o ya existe"); };
