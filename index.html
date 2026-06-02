@@ -46,7 +46,8 @@
         .single-news-meta { color: #88aaff; margin-bottom: 30px; font-size: 0.9rem; }
         .single-news-body { font-size: 1.1rem; line-height: 1.7; color: #ddd; white-space: pre-wrap; }
         .back-home { display: inline-block; margin-top: 30px; color: #00ffcc; text-decoration: none; font-weight: bold; cursor: pointer; }
-        .share-news-btn { margin:20px 0; background:#00ffcc22; border:1px solid #00ffcc55; color:#00ffcc; border-radius:10px; padding:10px 14px; cursor:pointer; font-weight:bold; }
+        .share-news-btn { margin:20px 0; background:#00ffcc22; border:1px solid #00ffcc55; color:#00ffcc; border-radius:10px; padding:10px 14px; cursor:pointer; font-weight:bold; transition:0.2s; }
+        .share-news-btn:hover { background:#00ffcc44; transform:scale(1.02); }
         @media (max-width: 700px) { .logo-area h1 { font-size: 1.8rem; } .news-grid { gap: 20px; } .card-title { font-size: 1.2rem; } .single-news-title { font-size: 1.8rem; } .single-news-img { height: 250px; } .single-news-content { padding: 20px; } }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.95); z-index: 1000; justify-content: center; align-items: center; overflow-y: auto; padding: 20px; }
         .modal-content { background: #0f1219; max-width: 800px; width: 100%; border-radius: 28px; padding: 30px; border: 1px solid #00ffcc; max-height: 90vh; overflow-y: auto; }
@@ -107,7 +108,6 @@
         </div>
         
         <div id="adminPanel" style="display:none;">
-            <!-- NUEVA SECCIÓN: SUBIDA AUTOMÁTICA A GITHUB -->
             <h3>🚀 SUBIR A GITHUB AUTOMÁTICAMENTE</h3>
             <div class="github-section">
                 <div class="flex-btns">
@@ -267,8 +267,6 @@
         }
         const statusDiv = document.getElementById('githubPushStatus');
         statusDiv.innerHTML = "⏳ Subiendo a GitHub...";
-        
-        // Obtener el SHA actual del archivo (si existe) para actualizarlo
         const apiUrl = `https://api.github.com/repos/${repo}/contents/${filePath}`;
         let sha = null;
         try {
@@ -283,7 +281,6 @@
             }
         } catch(e) { console.warn(e); }
         
-        // Preparar contenido: el JSON completo con config y noticias actuales
         const fullData = {
             config: siteConfig,
             news: newsDatabase,
@@ -331,8 +328,6 @@
         const rawTitle = (siteConfig.title || 'HACKERS').replace('💣','').trim();
         document.getElementById('siteTitle').innerHTML = '<span class="logo-wrap"><span class="logo-icon" style="color:#fff;">💣</span><span class="logo-title">' + rawTitle + '</span></span>';
         document.getElementById('siteSubtitle').innerText = siteConfig.subtitle;
-    
-        document.getElementById('siteSubtitle').innerText = siteConfig.subtitle;
     }
     
     function applyFooter() {
@@ -375,79 +370,63 @@
     
     function showHome() {
         currentView = "home";
+        currentFilter = currentFilter;
         const mainContent = document.getElementById('mainContent');
         if (!document.getElementById('newsContainer')) mainContent.innerHTML = '<div id="newsContainer" class="news-grid"></div>';
         let filtered = [...newsDatabase].sort((a,b)=>new Date(b.date)-new Date(a.date));
         if(currentFilter) filtered = filtered.filter(n => (n.category||'').toLowerCase().trim() === (currentFilter||'').toLowerCase().trim());
         const container = document.getElementById('newsContainer');
-        if(filtered.length === 0) { container.innerHTML = "<div style='grid-column:1/-1;text-align:center;padding:60px;'>📭 No hay noticias en esta categoría. ¡Agrega desde el panel editorial!</div>"; return; }
-        container.innerHTML = filtered.map(article => `
-            <div class="news-card" data-id="${article.id}">
-                <button class="delete-news-btn admin-only" data-id="${article.id}" title="Eliminar noticia">🗑️</button>
-                <div class="card-img" style="background-image: url('${article.image || 'https://picsum.photos/id/13/400/220'}');">
-                    <span class="card-category">${escapeHtml(article.category)}</span>
+        if(filtered.length === 0) { container.innerHTML = "<div style='grid-column:1/-1;text-align:center;padding:60px;'>📭 No hay noticias en esta categoría. ¡Agrega desde el panel editorial!</div>"; }
+        else {
+            container.innerHTML = filtered.map(article => `
+                <div class="news-card" data-id="${article.id}">
+                    <button class="delete-news-btn admin-only" data-id="${article.id}" title="Eliminar noticia">🗑️</button>
+                    <div class="card-img" style="background-image: url('${article.image || 'https://picsum.photos/id/13/400/220'}');">
+                        <span class="card-category">${escapeHtml(article.category)}</span>
+                    </div>
+                    <div class="card-content">
+                        <h2 class="card-title">${escapeHtml(article.title)}</h2>
+                        <div class="card-meta"><span>📅 ${new Date(article.date).toLocaleDateString()}</span><span>🔮 ${escapeHtml(article.category)}</span></div>
+                        <p class="card-excerpt">${escapeHtml(article.excerpt.length > 140 ? article.excerpt.substring(0,140)+'…' : article.excerpt)}</p>
+                        <a class="read-more" data-id="${article.id}">Leer noticia completa →</a>
+                    </div>
                 </div>
-                <div class="card-content">
-                    <h2 class="card-title">${escapeHtml(article.title)}</h2>
-                    <div class="card-meta"><span>📅 ${new Date(article.date).toLocaleDateString()}</span><span>🔮 ${escapeHtml(article.category)}</span></div>
-                    <p class="card-excerpt">${escapeHtml(article.excerpt.length > 140 ? article.excerpt.substring(0,140)+'…' : article.excerpt)}</p>
-                    <a class="read-more" data-id="${article.id}">Leer noticia completa →</a>
-                </div>
-            </div>
-        `).join('');
+            `).join('');
+        }
         document.querySelectorAll('.delete-news-btn').forEach(btn => btn.addEventListener('click', (e) => { e.stopPropagation(); const id = btn.getAttribute('data-id'); if(confirm("Eliminar?")) { newsDatabase = newsDatabase.filter(n => n.id !== id); saveNews(); showHome(); if(document.getElementById('adminPanel').style.display === 'block') renderNewsListInAdmin(); } }));
         document.querySelectorAll('.read-more').forEach(link => link.addEventListener('click', (e) => { e.preventDefault(); showSingleNews(link.getAttribute('data-id')); }));
         document.querySelectorAll('.news-card').forEach(card => card.style.backgroundColor = siteConfig.colors.cardBg);
         document.querySelectorAll('.card-category').forEach(cat => cat.style.backgroundColor = siteConfig.colors.accent + "dd");
+        
+        if (window.location.hash) {
+            history.pushState(null, '', window.location.pathname + window.location.search);
+        }
     }
     
     function showSingleNews(id) {
         const article = newsDatabase.find(n => n.id === id);
-        if(!article) return;
+        if(!article) { showHome(); return; }
         currentView = "single";
         const mainContent = document.getElementById('mainContent');
-        mainContent.innerHTML = `
-            <div class="single-news">
-                <div class="single-news-img" style="background-image: url('${article.image || 'https://picsum.photos/id/13/900/400'}');"></div>
-                <div class="single-news-content">
-                    <div class="single-news-category">${escapeHtml(article.category)}</div>
-                    <h1 class="single-news-title">${escapeHtml(article.title)}</h1>
-                    <div class="single-news-meta">📅 ${new Date(article.date).toLocaleDateString()}</div>
-                    <div class="single-news-body">${escapeHtml(article.content || article.excerpt)}</div>
-                    <button class="share-news-btn" id="shareNewsBtn">📤 Compartir noticia</button><br>
-                    <a href="#" class="back-home back-home-btn" id="backHomeBtn">← Volver al inicio</a>
-                </div>
-            </div>
-        `;
-
+        mainContent.innerHTML = `<div class="single-news"><div class="single-news-img" style="background-image: url('${article.image || 'https://picsum.photos/id/13/900/400'}');"></div><div class="single-news-content"><div class="single-news-category">${escapeHtml(article.category)}</div><h1 class="single-news-title">${escapeHtml(article.title)}</h1><div class="single-news-meta">📅 ${new Date(article.date).toLocaleDateString()}</div><div class="single-news-body">${escapeHtml(article.content || article.excerpt)}</div><button class="share-news-btn" data-id="${article.id}">📤 Compartir noticia</button><br><a href="#" class="back-home back-home-btn" id="backHomeBtn">← Volver al inicio</a></div></div>`;
+        
         document.getElementById('backHomeBtn')?.addEventListener('click', (e) => { e.preventDefault(); showHome(); });
-
-        const shareBtn = document.getElementById('shareNewsBtn');
-        shareBtn?.addEventListener('click', async () => {
-            const shareUrl = `${window.location.origin}${window.location.pathname}#news-${article.id}`;
-
-            if (navigator.share) {
-                try {
-                    await navigator.share({
-                        title: article.title,
-                        text: article.excerpt,
-                        url: shareUrl
-                    });
-                } catch (err) {
-                    console.log(err);
-                }
-            } else {
+        const shareBtn = document.querySelector('.share-news-btn');
+        if(shareBtn) {
+            shareBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const shareUrl = window.location.origin + window.location.pathname + '#news-' + article.id;
                 try {
                     await navigator.clipboard.writeText(shareUrl);
-                    alert('Enlace copiado');
-                } catch (e) {
-                    prompt('Copia el enlace:', shareUrl);
+                    alert('✅ Enlace copiado: ' + shareUrl);
+                } catch(err) {
+                    prompt('📋 Copia manualmente el enlace:', shareUrl);
                 }
-            }
-        });
-
-        window.location.hash = 'news-' + article.id;
-    }
+            });
+        }
+        if (window.location.hash !== '#news-' + id) {
+            history.pushState(null, '', '#news-' + id);
+        }
     }
     
     function renderCategoriesInAdmin() { 
@@ -470,7 +449,7 @@
                 if(currentView==="home") showHome(); 
                 else if(currentView==="single") showSingleNews(id); 
                 alert("Noticia actualizada"); 
-                renderNewsListInAdmin(); // refrescar lista para mostrar cambios
+                renderNewsListInAdmin();
             } 
         }));
         document.querySelectorAll('.adminDeleteNewsBtn').forEach(btn => btn.addEventListener('click', () => { 
@@ -514,9 +493,17 @@
             if (savedNews) newsDatabase = JSON.parse(savedNews);
             else { newsDatabase = JSON.parse(JSON.stringify(DEFAULT_NEWS)); saveNews(); }
         }
-        applyColors(); applyBranding(); applyFooter(); renderNav(); showHome();
-        updateDate();
-        loadGitHubConfig();
+        applyColors(); applyBranding(); applyFooter(); renderNav(); updateDate(); loadGitHubConfig();
+        
+        const initialHash = window.location.hash;
+        if (initialHash && initialHash.startsWith('#news-')) {
+            const id = initialHash.replace('#news-', '');
+            const articleExists = newsDatabase.some(n => n.id === id);
+            if (articleExists) showSingleNews(id);
+            else showHome();
+        } else {
+            showHome();
+        }
     }
     
     function exportData() {
@@ -575,24 +562,17 @@
         document.getElementById('cardBgColor').value = siteConfig.colors.cardBg;
     }
     
+    function forceReloadAdminData(){
+        const savedConfig = localStorage.getItem(STORAGE_CONFIG);
+        const savedNews = localStorage.getItem(STORAGE_NEWS);
+        if(savedConfig){ try { siteConfig = JSON.parse(savedConfig); } catch(e){} }
+        if(savedNews){ try { newsDatabase = JSON.parse(savedNews); } catch(e){} }
+        updateAdminDisplayValues();
+        renderCategoriesInAdmin();
+        renderNewsListInAdmin();
+    }
     
-function forceReloadAdminData(){
-    const savedConfig = localStorage.getItem(STORAGE_CONFIG);
-    const savedNews = localStorage.getItem(STORAGE_NEWS);
-
-    if(savedConfig){
-        try { siteConfig = JSON.parse(savedConfig); } catch(e){}
-    }
-    if(savedNews){
-        try { newsDatabase = JSON.parse(savedNews); } catch(e){}
-    }
-
-    updateAdminDisplayValues();
-    renderCategoriesInAdmin();
-    renderNewsListInAdmin();
-}
-
-function refreshAdminPanelData() {
+    function refreshAdminPanelData() {
         if(document.getElementById('adminPanel').style.display === 'block') {
             updateAdminDisplayValues();
             renderCategoriesInAdmin();
@@ -612,37 +592,36 @@ function refreshAdminPanelData() {
     }
     
     function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
-    
     async function sha256(text){ const data = new TextEncoder().encode(text); const hashBuffer = await crypto.subtle.digest('SHA-256', data); return Array.from(new Uint8Array(hashBuffer)).map(b=>b.toString(16).padStart(2,'0')).join(''); }
     
     // MODAL & EVENTOS
     const modal = document.getElementById('adminModal');
     document.getElementById('footerSecretHint').onclick = () => {
-    forceReloadAdminData();
-    modal.style.display = 'flex';
-    if(isAdminMode){
-        document.getElementById('authSection').style.display='none';
-        document.getElementById('adminPanel').style.display='block';
         forceReloadAdminData();
-    }else{
-        document.getElementById('authSection').style.display='block';
-        document.getElementById('adminPanel').style.display='none';
-    }
-};
+        modal.style.display = 'flex';
+        if(isAdminMode){
+            document.getElementById('authSection').style.display='none';
+            document.getElementById('adminPanel').style.display='block';
+            forceReloadAdminData();
+        }else{
+            document.getElementById('authSection').style.display='block';
+            document.getElementById('adminPanel').style.display='none';
+        }
+    };
     document.getElementById('closeModalBtn').onclick = () => modal.style.display = 'none';
     window.onclick = (e) => { if(e.target === modal) modal.style.display = 'none'; };
     document.getElementById('loginBtn').onclick = async () => {
-    if(await sha256(document.getElementById('adminPassword').value) === ADMIN_PASSWORD_HASH) {
-        forceReloadAdminData();
-        document.getElementById('authSection').style.display='none';
-        document.getElementById('adminPanel').style.display='block';
-        setAdminMode(true);
-        forceReloadAdminData();
-    } else {
-        document.getElementById('loginError').innerText="⛔ Clave incorrecta.";
-    }
-};
-document.getElementById('logoutAdminBtn').onclick = logoutAdmin;
+        if(await sha256(document.getElementById('adminPassword').value) === ADMIN_PASSWORD_HASH) {
+            forceReloadAdminData();
+            document.getElementById('authSection').style.display='none';
+            document.getElementById('adminPanel').style.display='block';
+            setAdminMode(true);
+            forceReloadAdminData();
+        } else {
+            document.getElementById('loginError').innerText="⛔ Clave incorrecta.";
+        }
+    };
+    document.getElementById('logoutAdminBtn').onclick = logoutAdmin;
     document.getElementById('updateBrandBtn').onclick = () => { if(document.getElementById('editTitle').value) siteConfig.title = document.getElementById('editTitle').value; if(document.getElementById('editSubtitle').value) siteConfig.subtitle = document.getElementById('editSubtitle').value; saveConfig(); applyBranding(); refreshAdminPanelData(); alert("Título actualizado."); };
     document.getElementById('applyColorsBtn').onclick = () => { siteConfig.colors.headerBg = document.getElementById('headerBgColor').value; siteConfig.colors.accent = document.getElementById('accentColor').value; siteConfig.colors.bodyBg = document.getElementById('bodyBgColor').value; siteConfig.colors.textColor = document.getElementById('textColor').value; siteConfig.colors.cardBg = document.getElementById('cardBgColor').value; saveConfig(); applyColors(); if(currentView === "home") showHome(); alert("Colores actualizados."); };
     document.getElementById('addCategoryBtn').onclick = () => { let newCat = document.getElementById('newCategoryName').value.trim(); if(newCat && !siteConfig.categories.includes(newCat)) { siteConfig.categories.push(newCat); saveConfig(); renderNav(); refreshAdminPanelData(); document.getElementById('newCategoryName').value=''; alert("Categoría agregada."); } else alert("Inválida o ya existe"); };
@@ -655,29 +634,18 @@ document.getElementById('logoutAdminBtn').onclick = logoutAdmin;
     document.getElementById('saveGitHubConfigBtn').onclick = saveGitHubConfigToLocal;
     document.getElementById('pushToGitHubBtn').onclick = uploadToGitHub;
     
-    async function initApp() {
-        await loadData();
-
-        if (window.location.hash.startsWith('#news-')) {
-            const id = window.location.hash.replace('#news-', '');
-            showSingleNews(id);
-        }
-    }
-
     window.addEventListener('hashchange', () => {
         const hash = window.location.hash;
-
         if (hash.startsWith('#news-')) {
             const id = hash.replace('#news-', '');
-            showSingleNews(id);
+            if (newsDatabase.some(n => n.id === id)) showSingleNews(id);
+            else showHome();
         } else if (currentView === "single") {
             showHome();
         }
     });
-
-    initApp();
-    document.addEventListener('contextmenu', e => e.preventDefault());
-    document.addEventListener('keydown', function(e){ const k=(e.key||'').toUpperCase(); if(k==='F12'||(e.ctrlKey&&e.shiftKey&&['I','J','C','K'].includes(k))||(e.ctrlKey&&['U','S'].includes(k))){ e.preventDefault(); e.stopPropagation(); return false; } }, true);
+    
+    loadData();
 </script>
 </body>
 </html>
