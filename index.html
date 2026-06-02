@@ -408,7 +408,28 @@
         const mainContent = document.getElementById('mainContent');
         mainContent.innerHTML = `<div class="single-news"><div class="single-news-img" style="background-image: url('${article.image || 'https://picsum.photos/id/13/900/400'}');"></div><div class="single-news-content"><div class="single-news-category">${escapeHtml(article.category)}</div><h1 class="single-news-title">${escapeHtml(article.title)}</h1><div class="single-news-meta">📅 ${new Date(article.date).toLocaleDateString()}</div><div class="single-news-body">${escapeHtml(article.content || article.excerpt)}</div><button class="share-news-btn" data-id="${article.id}">📤 Compartir noticia</button><br><a href="#" class="back-home back-home-btn" id="backHomeBtn">← Volver al inicio</a></div></div>`;
         document.getElementById('backHomeBtn')?.addEventListener('click', (e) => { e.preventDefault(); showHome(); });
-        document.querySelector('.share-news-btn')?.addEventListener('click', async () => { const shareUrl = window.location.origin + window.location.pathname + '#news-'+article.id; try { await navigator.clipboard.writeText(shareUrl); alert('Link copiado'); } catch(e) { prompt('Copia el enlace:', shareUrl); } });
+        document.querySelector('.share-news-btn')?.addEventListener('click', async () => {
+            const shareUrl = `${window.location.origin}${window.location.pathname}#news-${article.id}`;
+
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: article.title,
+                        text: article.excerpt,
+                        url: shareUrl
+                    });
+                } catch (err) {
+                    console.log(err);
+                }
+            } else {
+                try {
+                    await navigator.clipboard.writeText(shareUrl);
+                    alert('Enlace copiado');
+                } catch (e) {
+                    prompt('Copia el enlace:', shareUrl);
+                }
+            }
+        });
         window.location.hash = 'news-'+article.id;
     }
     
@@ -617,9 +638,27 @@ document.getElementById('logoutAdminBtn').onclick = logoutAdmin;
     document.getElementById('saveGitHubConfigBtn').onclick = saveGitHubConfigToLocal;
     document.getElementById('pushToGitHubBtn').onclick = uploadToGitHub;
     
-    loadData();
-    window.addEventListener('hashchange', () => { const hash=window.location.hash; if(hash.startsWith('#news-')) showSingleNews(hash.replace('#news-','')); else if(currentView==="single") showHome(); });
-    if(window.location.hash.startsWith('#news-')) showSingleNews(window.location.hash.replace('#news-',''));
+    async function initApp() {
+        await loadData();
+
+        if (window.location.hash.startsWith('#news-')) {
+            const id = window.location.hash.replace('#news-', '');
+            showSingleNews(id);
+        }
+    }
+
+    window.addEventListener('hashchange', () => {
+        const hash = window.location.hash;
+
+        if (hash.startsWith('#news-')) {
+            const id = hash.replace('#news-', '');
+            showSingleNews(id);
+        } else if (currentView === "single") {
+            showHome();
+        }
+    });
+
+    initApp();
     document.addEventListener('contextmenu', e => e.preventDefault());
     document.addEventListener('keydown', function(e){ const k=(e.key||'').toUpperCase(); if(k==='F12'||(e.ctrlKey&&e.shiftKey&&['I','J','C','K'].includes(k))||(e.ctrlKey&&['U','S'].includes(k))){ e.preventDefault(); e.stopPropagation(); return false; } }, true);
 </script>
