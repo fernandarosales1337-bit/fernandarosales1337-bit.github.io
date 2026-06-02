@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Hackers News - Portal con GitHub Sync</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🐱‍👤%3C/text%3E%3C/svg%3E">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E💣%3C/text%3E%3C/svg%3E">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', 'Roboto', 'Merriweather', Georgia, serif; background: #0a0c0f; color: #e0e0e0; line-height: 1.5; }
@@ -59,6 +59,7 @@
         hr { margin: 20px 0; border-color: #2a3a4a; }
         .current-value { font-size: 12px; color: #88aaff; margin-bottom: 5px; }
         .logo-wrap{ display:inline-flex; align-items:center; gap:10px; }
+.logo-icon{color:#fff;text-shadow:none;background:none;}
         .remote-status { background: #1a2a2a; padding: 8px; border-radius: 12px; font-size: 0.8rem; margin: 10px 0; }
         .btn-warning { background: #ffaa33; color: #000; }
         .flex-btns { display: flex; gap: 12px; flex-wrap: wrap; margin: 10px 0; }
@@ -71,7 +72,7 @@
     <div class="container">
         <div class="header-content">
             <div class="logo-area">
-                <h1 id="siteTitle"><span class="logo-wrap"><span class="logo-icon">🐱‍👤</span><span class="logo-title">HACKERS</span></span></h1>
+                <h1 id="siteTitle"><span class="logo-wrap"><span class="logo-icon">💣</span><span class="logo-title">HACKERS</span></span></h1>
                 <p id="siteSubtitle">periódico satírico · hacktivismo · cultura glitch</p>
             </div>
             <div class="date-badge" id="currentDate"></div>
@@ -159,7 +160,7 @@
             
             <h3>📰 GESTIÓN DE NOTICIAS</h3>
             <div id="newsListAdmin" style="max-height: 300px; overflow-y: auto; background:#1a1e2a; padding:10px; border-radius:12px;"></div>
-            <button id="addNewsAdminBtn" style="background:#44ff44; margin-top:10px;">➕ Agregar Nueva Noticia</button>
+            <button id="addNewsAdminBtn" style="background:#44ff44; margin-top:10px;">➕ Agregar Nueva Noticia</button><button id="saveAllNewsBtn" style="background:#00aaff; margin-top:10px;">💾 Guardar Todos los Cambios</button>
             
             <h3>💾 RESPALDO LOCAL</h3>
             <div class="flex-btns">
@@ -185,7 +186,7 @@
 <script>
     // ================= CONFIGURACIÓN GLOBAL =================
     let siteConfig = {
-        title: "🐱‍👤 HACKERS",
+        title: "💣 HACKERS",
         subtitle: "periódico satírico · hacktivismo · cultura glitch",
         footerText: "Hackers News · Sátira digital y crítica social. Ningún gobierno fue vulnerado (quizás).",
         watermark: "🔐 [editorial]",
@@ -328,8 +329,8 @@
     }
     
     function applyBranding() {
-        const rawTitle = (siteConfig.title || 'HACKERS').replace('🐱‍👤','').trim();
-        document.getElementById('siteTitle').innerHTML = '<span class="logo-wrap"><span class="logo-icon">🐱‍👤</span><span class="logo-title">' + rawTitle + '</span></span>';
+        const rawTitle = (siteConfig.title || 'HACKERS').replace('💣','').trim();
+        document.getElementById('siteTitle').innerHTML = '<span class="logo-wrap"><span class="logo-icon">💣</span><span class="logo-title">' + rawTitle + '</span></span>';
         document.getElementById('siteSubtitle').innerText = siteConfig.subtitle;
     }
     
@@ -444,6 +445,25 @@
         }));
     }
     
+    
+    function saveAllNewsEdits() {
+        document.querySelectorAll('.saveNewsEditBtn').forEach(btn=>{
+            const id=btn.getAttribute('data-id');
+            const news=newsDatabase.find(n=>n.id===id);
+            if(news){
+                news.title=document.querySelector(`.edit-news-title[data-id="${id}"]`).value;
+                news.category=document.querySelector(`.edit-news-category[data-id="${id}"]`).value;
+                news.excerpt=document.querySelector(`.edit-news-excerpt[data-id="${id}"]`).value;
+                news.content=document.querySelector(`.edit-news-content[data-id="${id}"]`).value;
+                news.image=document.querySelector(`.edit-news-image[data-id="${id}"]`).value;
+            }
+        });
+        saveNews();
+        if(currentView==="home") showHome();
+        refreshAdminPanelData();
+        alert("Todos los cambios fueron guardados.");
+    }
+
     async function loadFromDefaultRemote() {
         try {
             const response = await fetch(DEFAULT_REMOTE_JSON_PATH);
@@ -510,7 +530,7 @@
     
     function resetAll() {
         if(confirm("RESET TOTAL: restaurar datos demo y borrar configuración remota.")) {
-            siteConfig = { title: "🐱‍👤 HACKERS", subtitle: "periódico satírico · hacktivismo · cultura glitch", footerText: "Hackers News · Sátira digital y crítica social. Ningún gobierno fue vulnerado (quizás).", watermark: "🔐 [editorial]", colors: { headerBg: "#000000dd", accent: "#00ffcc", bodyBg: "#0a0c0f", textColor: "#e0e0e0", cardBg: "#12161f" }, categories: ["🏠 PORTADA", "💻 HACKTIVISMO", "😂 SÁTIRA", "🔓 LEAKS", "🤖 IA REBELDE"] };
+            siteConfig = { title: "💣 HACKERS", subtitle: "periódico satírico · hacktivismo · cultura glitch", footerText: "Hackers News · Sátira digital y crítica social. Ningún gobierno fue vulnerado (quizás).", watermark: "🔐 [editorial]", colors: { headerBg: "#000000dd", accent: "#00ffcc", bodyBg: "#0a0c0f", textColor: "#e0e0e0", cardBg: "#12161f" }, categories: ["🏠 PORTADA", "💻 HACKTIVISMO", "😂 SÁTIRA", "🔓 LEAKS", "🤖 IA REBELDE"] };
             newsDatabase = JSON.parse(JSON.stringify(DEFAULT_NEWS));
             saveConfig(); saveNews();
             applyColors(); applyBranding(); applyFooter(); renderNav(); currentFilter = null; showHome();
@@ -560,7 +580,7 @@
     
     // MODAL & EVENTOS
     const modal = document.getElementById('adminModal');
-    document.getElementById('footerSecretHint').onclick = () => { modal.style.display = 'flex'; if(isAdminMode) { document.getElementById('authSection').style.display='none'; document.getElementById('adminPanel').style.display='block'; refreshAdminPanelData(); } };
+    document.getElementById('footerSecretHint').onclick = () => { refreshAdminPanelData(); modal.style.display = 'flex'; if(isAdminMode) { document.getElementById('authSection').style.display='none'; document.getElementById('adminPanel').style.display='block'; refreshAdminPanelData(); } };
     document.getElementById('closeModalBtn').onclick = () => modal.style.display = 'none';
     window.onclick = (e) => { if(e.target === modal) modal.style.display = 'none'; };
     document.getElementById('loginBtn').onclick = async () => { 
@@ -583,6 +603,7 @@
     document.getElementById('importFileInput').onchange = (e) => { if(e.target.files[0]) importData(e.target.files[0]); e.target.value=''; };
     document.getElementById('saveGitHubConfigBtn').onclick = saveGitHubConfigToLocal;
     document.getElementById('pushToGitHubBtn').onclick = uploadToGitHub;
+    document.getElementById('saveAllNewsBtn').onclick = saveAllNewsEdits;
     
     loadData();
     window.addEventListener('hashchange', () => { const hash=window.location.hash; if(hash.startsWith('#news-')) showSingleNews(hash.replace('#news-','')); else if(currentView==="single") showHome(); });
