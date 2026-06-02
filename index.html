@@ -607,34 +607,30 @@
         updateDate();
     }
     
-    
-function saveConfig() {
-    localStorage.setItem(STORAGE_CONFIG, JSON.stringify(siteConfig));
+    function saveConfig() {
+        localStorage.setItem(STORAGE_CONFIG, JSON.stringify(siteConfig));
 
-    if(window.autoSyncEnabled !== false){
-        uploadToGitHub({
-            config: siteConfig,
-            news: newsDatabase,
-            version: "1.0",
-            exportDate: new Date().toISOString()
-        });
+        if(window.autoSyncEnabled){
+            uploadToGitHub({
+                config: siteConfig,
+                news: newsDatabase,
+                version: "1.0",
+                exportDate: new Date().toISOString()
+            });
+        }
     }
-}
+    function saveNews() {
+        localStorage.setItem(STORAGE_NEWS, JSON.stringify(newsDatabase));
 
-    
-function saveNews() {
-    localStorage.setItem(STORAGE_NEWS, JSON.stringify(newsDatabase));
-
-    if(window.autoSyncEnabled !== false){
-        uploadToGitHub({
-            config: siteConfig,
-            news: newsDatabase,
-            version: "1.0",
-            exportDate: new Date().toISOString()
-        });
+        if(window.autoSyncEnabled){
+            uploadToGitHub({
+                config: siteConfig,
+                news: newsDatabase,
+                version: "1.0",
+                exportDate: new Date().toISOString()
+            });
+        }
     }
-}
-
     
     function applyColors() {
         document.body.style.backgroundColor = siteConfig.colors.bodyBg;
@@ -1024,7 +1020,6 @@ return `<option value="${val}" ${n.category===val?'selected':''}>${c}</option>`;
                         renderCategoriesInAdmin();
                         renderNewsListInAdmin();
                     }
-                    
                     uploadToGitHub(imported);
                     alert("✅ Datos importados correctamente y sincronizados con GitHub.");
                 } else {
@@ -1136,30 +1131,29 @@ return `<option value="${val}" ${n.category===val?'selected':''}>${c}</option>`;
 <!-- GITHUB AUTO SYNC -->
 <script>
 const GITHUB_SYNC = {
-    owner: "fernandarosales1337-bit",
-    repo: "fernandarosales1337-bit",
+    owner: "TU_USUARIO",
+    repo: "TU_REPOSITORIO",
     branch: "main",
     path: "data.json",
-    token: "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"
+    token: "PON_AQUI_TU_TOKEN"
 };
 
-window.autoSyncEnabled = false;
-
 async function loadRemoteData() {
+
     try {
 
         const url =
         `https://raw.githubusercontent.com/${GITHUB_SYNC.owner}/${GITHUB_SYNC.repo}/${GITHUB_SYNC.branch}/${GITHUB_SYNC.path}?t=${Date.now()}`;
 
-        const response = await fetch(url);
+        const res = await fetch(url);
 
-        if (!response.ok) {
-            console.warn("No existe data.json remoto. Usando localStorage.");
-            loadRemoteData();
+        if (!res.ok) {
+            console.warn("No existe data.json remoto");
+            loadData();
             return;
         }
 
-        const remote = await response.json();
+        const remote = await res.json();
 
         if (remote.config && remote.news) {
 
@@ -1177,28 +1171,27 @@ async function loadRemoteData() {
             currentFilter = null;
             showHome();
 
-            console.log("✅ Datos cargados desde GitHub");
+            console.log("Datos cargados desde GitHub");
 
         } else {
-            console.warn("JSON remoto inválido");
-            loadRemoteData();
+
+            loadData();
         }
 
     } catch(err) {
-        console.error("Error GitHub:", err);
-        loadRemoteData();
+
+        console.error(err);
+        loadData();
     }
 }
 
 async function uploadToGitHub(dataObject) {
 
     if (
-        !GITHUB_SYNC.owner ||
-        !GITHUB_SYNC.repo ||
         !GITHUB_SYNC.token ||
         GITHUB_SYNC.token.includes("PON_AQUI")
     ) {
-        console.warn("⚠️ Debes configurar GitHub Sync.");
+        console.warn("Debes configurar GitHub Sync");
         return;
     }
 
@@ -1209,19 +1202,19 @@ async function uploadToGitHub(dataObject) {
 
         let sha = null;
 
-        const getResponse = await fetch(apiUrl, {
+        const current = await fetch(apiUrl, {
             headers: {
                 Authorization: `Bearer ${GITHUB_SYNC.token}`,
                 Accept: "application/vnd.github+json"
             }
         });
 
-        if (getResponse.ok) {
-            const currentFile = await getResponse.json();
-            sha = currentFile.sha;
+        if (current.ok) {
+            const currentData = await current.json();
+            sha = currentData.sha;
         }
 
-        const encodedContent = btoa(
+        const content = btoa(
             unescape(
                 encodeURIComponent(
                     JSON.stringify(dataObject, null, 2)
@@ -1229,36 +1222,34 @@ async function uploadToGitHub(dataObject) {
             )
         );
 
-        const payload = {
-            message: "Actualización automática desde panel admin",
-            content: encodedContent,
+        const body = {
+            message: "Actualizacion automatica",
+            content: content,
             branch: GITHUB_SYNC.branch
         };
 
-        if (sha) {
-            payload.sha = sha;
-        }
+        if (sha) body.sha = sha;
 
-        const uploadResponse = await fetch(apiUrl, {
+        const upload = await fetch(apiUrl, {
             method: "PUT",
             headers: {
                 Authorization: `Bearer ${GITHUB_SYNC.token}`,
                 "Content-Type": "application/json",
                 Accept: "application/vnd.github+json"
             },
-            body: JSON.stringify(payload)
+            body: JSON.stringify(body)
         });
 
-        if (!uploadResponse.ok) {
-            const txt = await uploadResponse.text();
-            throw new Error(txt);
+        if (!upload.ok) {
+            throw new Error(await upload.text());
         }
 
-        console.log("✅ GitHub sincronizado");
+        console.log("GitHub actualizado");
 
     } catch(err) {
-        console.error("❌ Error subiendo a GitHub:", err);
-        alert("Error sincronizando con GitHub.");
+
+        console.error(err);
+        alert("Error sincronizando GitHub");
     }
 }
 </script>
@@ -1311,14 +1302,17 @@ window.saveNewsFromPopup = function(title,category,excerpt,content,image){
         e.target.value = ''; // Limpiar input para permitir re-importar el mismo archivo si se desea
     };
 
-    loadRemoteData();
-    openNewsFromHash();
-    
-window.addEventListener('hashchange', openNewsFromHash);
+    window.autoSyncEnabled = false;
 
-setTimeout(() => {
-    window.autoSyncEnabled = true;
-}, 3000);
+    loadRemoteData();
+
+    openNewsFromHash();
+
+    window.addEventListener('hashchange', openNewsFromHash);
+
+    setTimeout(() => {
+        window.autoSyncEnabled = true;
+    }, 3000);
 
     updateAdminDisplayValues();
     renderCategoriesInAdmin();
@@ -1352,26 +1346,25 @@ const GITHUB_SYNC = {
     repo: "TU_REPOSITORIO",
     branch: "main",
     path: "data.json",
-    token: "PON_AQUI_TU_TOKEN_GITHUB"
+    token: "PON_AQUI_TU_TOKEN"
 };
 
-window.autoSyncEnabled = false;
-
 async function loadRemoteData() {
+
     try {
 
         const url =
         `https://raw.githubusercontent.com/${GITHUB_SYNC.owner}/${GITHUB_SYNC.repo}/${GITHUB_SYNC.branch}/${GITHUB_SYNC.path}?t=${Date.now()}`;
 
-        const response = await fetch(url);
+        const res = await fetch(url);
 
-        if (!response.ok) {
-            console.warn("No existe data.json remoto. Usando localStorage.");
-            loadRemoteData();
+        if (!res.ok) {
+            console.warn("No existe data.json remoto");
+            loadData();
             return;
         }
 
-        const remote = await response.json();
+        const remote = await res.json();
 
         if (remote.config && remote.news) {
 
@@ -1389,28 +1382,27 @@ async function loadRemoteData() {
             currentFilter = null;
             showHome();
 
-            console.log("✅ Datos cargados desde GitHub");
+            console.log("Datos cargados desde GitHub");
 
         } else {
-            console.warn("JSON remoto inválido");
-            loadRemoteData();
+
+            loadData();
         }
 
     } catch(err) {
-        console.error("Error GitHub:", err);
-        loadRemoteData();
+
+        console.error(err);
+        loadData();
     }
 }
 
 async function uploadToGitHub(dataObject) {
 
     if (
-        !GITHUB_SYNC.owner ||
-        !GITHUB_SYNC.repo ||
         !GITHUB_SYNC.token ||
         GITHUB_SYNC.token.includes("PON_AQUI")
     ) {
-        console.warn("⚠️ Debes configurar GitHub Sync.");
+        console.warn("Debes configurar GitHub Sync");
         return;
     }
 
@@ -1421,19 +1413,19 @@ async function uploadToGitHub(dataObject) {
 
         let sha = null;
 
-        const getResponse = await fetch(apiUrl, {
+        const current = await fetch(apiUrl, {
             headers: {
                 Authorization: `Bearer ${GITHUB_SYNC.token}`,
                 Accept: "application/vnd.github+json"
             }
         });
 
-        if (getResponse.ok) {
-            const currentFile = await getResponse.json();
-            sha = currentFile.sha;
+        if (current.ok) {
+            const currentData = await current.json();
+            sha = currentData.sha;
         }
 
-        const encodedContent = btoa(
+        const content = btoa(
             unescape(
                 encodeURIComponent(
                     JSON.stringify(dataObject, null, 2)
@@ -1441,36 +1433,34 @@ async function uploadToGitHub(dataObject) {
             )
         );
 
-        const payload = {
-            message: "Actualización automática desde panel admin",
-            content: encodedContent,
+        const body = {
+            message: "Actualizacion automatica",
+            content: content,
             branch: GITHUB_SYNC.branch
         };
 
-        if (sha) {
-            payload.sha = sha;
-        }
+        if (sha) body.sha = sha;
 
-        const uploadResponse = await fetch(apiUrl, {
+        const upload = await fetch(apiUrl, {
             method: "PUT",
             headers: {
                 Authorization: `Bearer ${GITHUB_SYNC.token}`,
                 "Content-Type": "application/json",
                 Accept: "application/vnd.github+json"
             },
-            body: JSON.stringify(payload)
+            body: JSON.stringify(body)
         });
 
-        if (!uploadResponse.ok) {
-            const txt = await uploadResponse.text();
-            throw new Error(txt);
+        if (!upload.ok) {
+            throw new Error(await upload.text());
         }
 
-        console.log("✅ GitHub sincronizado");
+        console.log("GitHub actualizado");
 
     } catch(err) {
-        console.error("❌ Error subiendo a GitHub:", err);
-        alert("Error sincronizando con GitHub.");
+
+        console.error(err);
+        alert("Error sincronizando GitHub");
     }
 }
 </script>
