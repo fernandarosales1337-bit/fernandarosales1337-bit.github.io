@@ -29,15 +29,6 @@
       "date": "2026-06-02T21:44:41.783Z"
     },
     {
-      "id": "17804313663890.18025626967644748",
-      "title": "Hacker UniPro toma el control de cámaras en aspiradoras robot y expone vulnerabilidad masiva",
-      "category": "HACKTIVISMO",
-      "excerpt": "Un nuevo actor en el mundo de la ciberseguridad ha encendido todas las alarmas. Bajo el alias UniPro, este hacker emergente logró infiltrarse en los sistemas de múltiples modelos de aspiradoras robot con cámara integrada, tomando control remoto de los dispositivos y accediendo a transmisiones de video en tiempo real desde el interior de hogares particulares.",
-      "content": "Un nuevo actor en el mundo de la ciberseguridad ha encendido todas las alarmas. Bajo el alias UniPro, este hacker emergente logró infiltrarse en los sistemas de múltiples modelos de aspiradoras robot con cámara integrada, tomando control remoto de los dispositivos y accediendo a transmisiones de video en tiempo real desde el interior de hogares particulares.\n\nEl hallazgo, que inicialmente circuló en foros especializados de white hat (hackers éticos), fue confirmado tras una investigación independiente que detectó patrones anómalos en el tráfico de datos de decenas de aspiradoras de distintas marcas económicas. UniPro habría explotado una vulnerabilidad crítica en el protocolo de autenticación de los dispositivos, permitiéndole no solo ver a través de las cámaras, sino también mover los aparatos de forma remota.\n\nSegún las primeras pesquisas, UniPro habría publicado en una darknet una breve pero contundente demostración de clips de segundos donde se ven salas de estar, cocinas y dormitorios, todos captados desde la perspectiva de una aspiradora robot. El hacker asegura que solo expuso imágenes genéricas sin datos personales identificables para \"no causar daños reales\", pero advierte que el fallo sigue sin parchear en muchos modelos económicos.",
-      "image": "https://images2.imgbox.com/69/ce/sBgWcOyz_o.jpg",
-      "date": "2026-06-02T20:16:06.390Z"
-    },
-    {
       "id": "17804304107650.3832444116685748",
       "title": "Frikyta deslumbra al cantar en su muro y recibe lluvia de elogios",
       "category": "INTERNACIONALES",
@@ -84,5 +75,5 @@
     }
   ],
   "version": "1.0",
-  "exportDate": "2026-06-02T21:45:49.087Z"
+  "exportDate": "2026-06-02T22:13:06.185Z"
 }
