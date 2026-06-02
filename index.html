@@ -59,7 +59,6 @@
         hr { margin: 20px 0; border-color: #2a3a4a; }
         .current-value { font-size: 12px; color: #88aaff; margin-bottom: 5px; }
         .logo-wrap{ display:inline-flex; align-items:center; gap:10px; }
-.logo-icon{color:#fff;text-shadow:none;background:none;}
         .remote-status { background: #1a2a2a; padding: 8px; border-radius: 12px; font-size: 0.8rem; margin: 10px 0; }
         .btn-warning { background: #ffaa33; color: #000; }
         .flex-btns { display: flex; gap: 12px; flex-wrap: wrap; margin: 10px 0; }
@@ -160,7 +159,7 @@
             
             <h3>📰 GESTIÓN DE NOTICIAS</h3>
             <div id="newsListAdmin" style="max-height: 300px; overflow-y: auto; background:#1a1e2a; padding:10px; border-radius:12px;"></div>
-            <button id="addNewsAdminBtn" style="background:#44ff44; margin-top:10px;">➕ Agregar Nueva Noticia</button><button id="saveAllNewsBtn" style="background:#00aaff; margin-top:10px;">💾 Guardar Todos los Cambios</button>
+            <button id="addNewsAdminBtn" style="background:#44ff44; margin-top:10px;">➕ Agregar Nueva Noticia</button>
             
             <h3>💾 RESPALDO LOCAL</h3>
             <div class="flex-btns">
@@ -445,25 +444,6 @@
         }));
     }
     
-    
-    function saveAllNewsEdits() {
-        document.querySelectorAll('.saveNewsEditBtn').forEach(btn=>{
-            const id=btn.getAttribute('data-id');
-            const news=newsDatabase.find(n=>n.id===id);
-            if(news){
-                news.title=document.querySelector(`.edit-news-title[data-id="${id}"]`).value;
-                news.category=document.querySelector(`.edit-news-category[data-id="${id}"]`).value;
-                news.excerpt=document.querySelector(`.edit-news-excerpt[data-id="${id}"]`).value;
-                news.content=document.querySelector(`.edit-news-content[data-id="${id}"]`).value;
-                news.image=document.querySelector(`.edit-news-image[data-id="${id}"]`).value;
-            }
-        });
-        saveNews();
-        if(currentView==="home") showHome();
-        refreshAdminPanelData();
-        alert("Todos los cambios fueron guardados.");
-    }
-
     async function loadFromDefaultRemote() {
         try {
             const response = await fetch(DEFAULT_REMOTE_JSON_PATH);
@@ -580,17 +560,26 @@
     
     // MODAL & EVENTOS
     const modal = document.getElementById('adminModal');
-    document.getElementById('footerSecretHint').onclick = () => { refreshAdminPanelData(); modal.style.display = 'flex'; if(isAdminMode) { document.getElementById('authSection').style.display='none'; document.getElementById('adminPanel').style.display='block'; refreshAdminPanelData(); } };
+    document.getElementById('footerSecretHint').onclick = () => {
+    modal.style.display = 'flex';
+    if(isAdminMode){
+        document.getElementById('authSection').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+        refreshAdminPanelData();
+    }
+};
     document.getElementById('closeModalBtn').onclick = () => modal.style.display = 'none';
     window.onclick = (e) => { if(e.target === modal) modal.style.display = 'none'; };
-    document.getElementById('loginBtn').onclick = async () => { 
-        if(await sha256(document.getElementById('adminPassword').value) === ADMIN_PASSWORD_HASH) { 
-            document.getElementById('authSection').style.display='none'; 
-            document.getElementById('adminPanel').style.display='block'; 
-            setAdminMode(true); 
-            refreshAdminPanelData(); 
-        } else document.getElementById('loginError').innerText="⛔ Clave incorrecta."; 
-    };
+    document.getElementById('loginBtn').onclick = async () => {
+    if(await sha256(document.getElementById('adminPassword').value) === ADMIN_PASSWORD_HASH){
+        document.getElementById('authSection').style.display='none';
+        document.getElementById('adminPanel').style.display='block';
+        setAdminMode(true);
+        refreshAdminPanelData();
+    } else {
+        document.getElementById('loginError').innerText="⛔ Clave incorrecta.";
+    }
+};
     document.getElementById('logoutAdminBtn').onclick = logoutAdmin;
     document.getElementById('updateBrandBtn').onclick = () => { if(document.getElementById('editTitle').value) siteConfig.title = document.getElementById('editTitle').value; if(document.getElementById('editSubtitle').value) siteConfig.subtitle = document.getElementById('editSubtitle').value; saveConfig(); applyBranding(); refreshAdminPanelData(); alert("Título actualizado."); };
     document.getElementById('applyColorsBtn').onclick = () => { siteConfig.colors.headerBg = document.getElementById('headerBgColor').value; siteConfig.colors.accent = document.getElementById('accentColor').value; siteConfig.colors.bodyBg = document.getElementById('bodyBgColor').value; siteConfig.colors.textColor = document.getElementById('textColor').value; siteConfig.colors.cardBg = document.getElementById('cardBgColor').value; saveConfig(); applyColors(); if(currentView === "home") showHome(); alert("Colores actualizados."); };
@@ -603,7 +592,6 @@
     document.getElementById('importFileInput').onchange = (e) => { if(e.target.files[0]) importData(e.target.files[0]); e.target.value=''; };
     document.getElementById('saveGitHubConfigBtn').onclick = saveGitHubConfigToLocal;
     document.getElementById('pushToGitHubBtn').onclick = uploadToGitHub;
-    document.getElementById('saveAllNewsBtn').onclick = saveAllNewsEdits;
     
     loadData();
     window.addEventListener('hashchange', () => { const hash=window.location.hash; if(hash.startsWith('#news-')) showSingleNews(hash.replace('#news-','')); else if(currentView==="single") showHome(); });
