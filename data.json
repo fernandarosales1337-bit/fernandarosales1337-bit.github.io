@@ -1,0 +1,52 @@
+{
+  "config": {
+    "title": "🐱‍👤 HACKERS",
+    "subtitle": "  periodismo · hacktivismo · cultura glitch",
+    "footerText": "Hackers News · Periodismo · Hacktivismo · Cultura Glitch.",
+    "watermark": "🔐 [editorial]",
+    "colors": {
+      "headerBg": "#000000dd",
+      "accent": "#00ffcc",
+      "bodyBg": "#0a0c0f",
+      "textColor": "#e0e0e0",
+      "cardBg": "#12161f"
+    },
+    "categories": [
+      "🏠 PORTADA",
+      "💻 HACKTIVISMO",
+      "📰 NACIONALES",
+      "🌍 INTERNACIONALES"
+    ]
+  },
+  "news": [
+    {
+      "id": "17803418303340.1267764555288785",
+      "title": "Hackers exponen datos de casi 64.000 jugadores de Grand Theft Auto V",
+      "category": "HACKTIVISMO",
+      "excerpt": "Atlas Menu, un servicio de trampas para el popular videojuego en línea Grand Theft Auto V, sufrió un hackeo que dejó expuestos datos de casi 64.000 cuentas. La brecha aparece registrada en Have I Been Pwned, el conocido sitio de notificación de filtraciones de datos",
+      "content": "Atlas Menu, un servicio de trampas para el popular videojuego en línea Grand Theft Auto V, sufrió un hackeo que dejó expuestos datos de casi 64.000 cuentas. La brecha aparece registrada en Have I Been Pwned, el conocido sitio de notificación de filtraciones de datos.\n\nLos datos robados incluían direcciones de correo electrónico, nombres de usuario, contraseñas ofuscadas, direcciones IP y tickets de soporte. La información comprometida apunta a usuarios que se registraron en Atlas Menu para obtener ventajas indebidas dentro del juego.\n\nEl caso resulta especialmente irónico porque Atlas Menu afirmaba ofrecer “autenticación segura y privacidad mejorada mediante nuestras técnicas avanzadas de cifrado”. Esa promesa aparecía en el sitio oficial del servicio, que no estaba disponible al momento del reporte original.",
+      "image": "https://images2.imgbox.com/4c/a0/RfaeKlC2_o.jpg",
+      "date": "2026-06-01T19:23:50.334Z"
+    },
+    {
+      "id": "17803407471660.6185846691767408",
+      "title": "Delcy le pide a migrantes que se regresen a estar sin luz en Venezuela",
+      "category": "NACIONALES",
+      "excerpt": "La presidenta encargada de cuidarle el coroto a Donald Trump, Delcy Rodríguez, le recordó esta semana a los millones de migrantes venezolanos que “Venezuela los necesita” y les pidió abandonar sus vidas en el exterior y regresar al país para estar sin luz, agua, y peor aún, con disco nuevo de Chyno y Nacho.",
+      "content": "La presidenta encargada de cuidarle el coroto a Donald Trump, Delcy Rodríguez, le recordó esta semana a los millones de migrantes venezolanos que “Venezuela los necesita” y les pidió abandonar sus vidas en el exterior y regresar al país para estar sin luz, agua, y peor aún, con disco nuevo de Chyno y Nacho.\n\nRodríguez ofreció estas impactantes declaraciones de migajismo presidencial durante su viaje al estado Cojedes, donde asistió personalmente a inaugurar una vela que iluminará Tinaquillo: “A todos los migrantes que están por allá en el extranjero pasando roncha teniendo que trabajar para vivir le digo una sóla cosa: regresen. Acá lo van a pasar rico sin electricidad para que se desconecten de toda la locura que se vive afuera en la civilización. Además, ¿quién necesita agua potable cuando tenemos las mejores playas del mundo? Pero más allá de eso, sepa que Venezuela los necesita. ¿A quién van a matraquear los policías? ¿a quién le vamos a cobrar los impuestos? Este país se saca adelante trabajando y les aseguro que oportunidades laborales sobran, pueden trabajar de cajera en un supermercado, de cajera en una farmacia y hasta de esclavo directamente.",
+      "image": "https://images2.imgbox.com/f8/1e/GfEOqhrt_o.jpg",
+      "date": "2026-06-01T19:05:47.166Z"
+    },
+    {
+      "id": "17803396970680.6038758230513194",
+      "title": "Autoridades españolas imputan a sujeto con cara de villano y acciones de villano por ser un villano",
+      "category": "INTERNACIONALES",
+      "excerpt": "La Audiencia Nacional de España imputó esta semana a José Luís Rodríguez Zapatero, expresidente y portador de la mayor cara de villano en la historia de la humanidad, con cargos por presuntos delitos villanísticos que, efectivamente, sólo podrían ser perpetrados por un verdadero villano.",
+      "content": "La Audiencia Nacional de España imputó esta semana a José Luís Rodríguez Zapatero, expresidente y portador de la mayor cara de villano en la historia de la humanidad, con cargos por presuntos delitos villanísticos que, efectivamente, sólo podrían ser perpetrados por un verdadero villano.\n\nJosé Luis Carpintero, titular del Juzgado Central de la Audiencia Nacional, emitió un comunicado explicando el razonamiento detrás de la imputación: “Venga, ¿ustedes le han visto la cara a este tipo? ¡Obviamente es un villano, joder! Lo único sorprendente aquí es que en España llevamos 20 años discutiendo si los moros esto y panchitos aquello mientras zapatero cometía sus crímenes de villano sin que nadie se diera cuenta. Venga, que estoy seguro que esa sonrisita malvada con las cejas malignas es la misma cara que tenía Judas Iscariote cuando vendió a Jesucristo por 30 bolívares”, concluyó Carpintero, mientras las autoridades detenían a Mr. Bean por error.",
+      "image": "https://images2.imgbox.com/1f/c4/gQhBNQvi_o.jpg",
+      "date": "2026-06-01T18:48:17.069Z"
+    }
+  ],
+  "version": "1.0",
+  "exportDate": "2026-06-01T21:30:16.982Z"
+}
