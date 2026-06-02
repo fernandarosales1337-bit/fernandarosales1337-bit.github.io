@@ -210,7 +210,19 @@
             return true;
         };
         document.addEventListener('keydown', blockKeys, true);
-        document.addEventListener('contextmenu', (e) => { e.preventDefault(); return false; }, true);
+        
+        // --- Bloqueo de clic derecho SOLO en escritorio (no en móviles) ---
+        // Detectamos si es dispositivo táctil o con pantalla pequeña (móvil/tableta)
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.matchMedia("(pointer: coarse)").matches;
+        
+        // Solo bloqueamos el menú contextual si NO es móvil
+        if (!isMobile) {
+            document.addEventListener('contextmenu', (e) => { 
+                e.preventDefault(); 
+                return false; 
+            }, true);
+        }
+        // En móviles, el menú contextual (mantener pulsado) queda libre para poder copiar texto.
         
         // Detectar consola abierta
         let devtoolsOpen = false;
