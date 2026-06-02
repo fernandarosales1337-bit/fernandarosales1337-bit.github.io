@@ -71,7 +71,7 @@
     <div class="container">
         <div class="header-content">
             <div class="logo-area">
-                <h1 id="siteTitle"><span class="logo-wrap"><span class="logo-icon">💣</span><span class="logo-title">HACKERS</span></span></h1>
+                <h1 id="siteTitle"><span class="logo-wrap"><span class="logo-icon" style="color:#fff;">💣</span><span class="logo-title">HACKERS</span></span></h1>
                 <p id="siteSubtitle">periódico satírico · hacktivismo · cultura glitch</p>
             </div>
             <div class="date-badge" id="currentDate"></div>
@@ -329,7 +329,9 @@
     
     function applyBranding() {
         const rawTitle = (siteConfig.title || 'HACKERS').replace('💣','').trim();
-        document.getElementById('siteTitle').innerHTML = '<span class="logo-wrap"><span class="logo-icon">💣</span><span class="logo-title">' + rawTitle + '</span></span>';
+        document.getElementById('siteTitle').innerHTML = '<span class="logo-wrap"><span class="logo-icon" style="color:#fff;">💣</span><span class="logo-title">' + rawTitle + '</span></span>';
+        document.getElementById('siteSubtitle').innerText = siteConfig.subtitle;
+    
         document.getElementById('siteSubtitle').innerText = siteConfig.subtitle;
     }
     
