@@ -3,442 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Hackers News - Portal de Noticias</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🐱‍👤%3C/text%3E%3C/svg%3E">
+    <title>Hackers News - Portal de Noticias con GitHub JSON</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🐱‍👤%3C/text%3E%3C/svg%3E">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', 'Roboto', 'Merriweather', Georgia, serif;
-            background: #0a0c0f;
-            color: #e0e0e0;
-            line-height: 1.5;
-        }
-
-        .container {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        .site-header {
-            background: #000000dd;
-            backdrop-filter: blur(8px);
-            border-bottom: 3px solid #00ffcc;
-            padding: 20px 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-        }
-
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .logo-area h1 {
-            font-size: 2.5rem;
-            letter-spacing: -1px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #00ffcc, #ff44cc);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            text-shadow: 0 0 8px #00ffcc55;
-        }
-
-        .logo-area p {
-            font-size: 0.85rem;
-            color: #aaa;
-            font-style: italic;
-        }
-
-        .date-badge {
-            font-family: monospace;
-            background: #1e1e2f;
-            padding: 8px 14px;
-            border-radius: 40px;
-            font-size: 0.8rem;
-            border-left: 3px solid #00ffcc;
-        }
-
-        .main-nav {
-            background: #11131a;
-            margin-top: 15px;
-            border-radius: 40px;
-            padding: 8px 16px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 25px;
-            flex-wrap: wrap;
-            list-style: none;
-        }
-
-        .nav-links li {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .nav-links a {
-            color: #ddd;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: 0.2s;
-            cursor: pointer;
-        }
-
-        .nav-links a:hover {
-            color: #00ffcc;
-        }
-
-        .delete-cat-btn {
-            background: #ff4444aa;
-            border: none;
-            color: white;
-            border-radius: 20px;
-            width: 20px;
-            height: 20px;
-            font-size: 12px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.2s;
-        }
-        .delete-cat-btn:hover {
-            background: #ff0000;
-            transform: scale(1.1);
-        }
-        .admin-only {
-            display: none;
-        }
-        body.admin-mode .admin-only {
-            display: inline-flex;
-        }
-
-        .news-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 30px;
-            margin: 40px 0;
-        }
-
-        .news-card {
-            background: #12161f;
-            border-radius: 18px;
-            overflow: hidden;
-            transition: transform 0.2s ease, box-shadow 0.2s;
-            box-shadow: 0 10px 20px -5px rgba(0,0,0,0.5);
-            border: 1px solid #2a2e3a;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        .news-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 20px 30px -10px #00ffcc20;
-            border-color: #00ffcc60;
-        }
-
-        .card-img {
-            height: 200px;
-            background-size: cover;
-            background-position: center;
-            background-color: #1f2a3a;
-            position: relative;
-        }
-
-        .card-category {
-            position: absolute;
-            bottom: 12px;
-            left: 12px;
-            background: #00ffccdd;
-            color: #000;
-            font-weight: bold;
-            padding: 4px 12px;
-            border-radius: 40px;
-            font-size: 0.7rem;
-            backdrop-filter: blur(2px);
-        }
-
-        .card-content {
-            padding: 20px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .card-title {
-            font-size: 1.5rem;
-            font-weight: 800;
-            margin-bottom: 12px;
-            line-height: 1.2;
-            color: #fff;
-        }
-
-        .card-meta {
-            font-size: 0.75rem;
-            color: #88aaff;
-            margin-bottom: 12px;
-            display: flex;
-            gap: 15px;
-        }
-
-        .card-excerpt {
-            color: #bbb;
-            margin-bottom: 20px;
-            font-size: 0.9rem;
-        }
-
-        .read-more {
-            margin-top: auto;
-            color: #00ffcc;
-            font-weight: bold;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-        }
-
-        .delete-news-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #ff0000cc;
-            border: none;
-            color: white;
-            border-radius: 30px;
-            width: 32px;
-            height: 32px;
-            font-size: 18px;
-            cursor: pointer;
-            z-index: 10;
-            backdrop-filter: blur(4px);
-            transition: 0.2s;
-        }
-        .delete-news-btn:hover {
-            background: #ff0000;
-            transform: scale(1.05);
-        }
-
-        footer {
-            background: #06080c;
-            text-align: center;
-            padding: 30px 0;
-            margin-top: 40px;
-            border-top: 1px solid #00ffcc30;
-            font-size: 0.8rem;
-        }
-
-        .secret-watermark {
-            text-align: center;
-            font-size: 10px;
-            margin-top: 15px;
-            opacity: 0.3;
-            cursor: pointer;
-        }
-        .secret-watermark:hover {
-            opacity: 0.8;
-        }
-
-        /* Página individual de noticia */
-        .single-news {
-            max-width: 900px;
-            margin: 40px auto;
-            background: #12161f;
-            border-radius: 28px;
-            overflow: hidden;
-            border: 1px solid #2a2e3a;
-        }
-        .single-news-img {
-            width: 100%;
-            height: 400px;
-            background-size: cover;
-            background-position: center;
-        }
-        .single-news-content {
-            padding: 40px;
-        }
-        .single-news-category {
-            display: inline-block;
-            background: #00ffccdd;
-            color: #000;
-            padding: 4px 16px;
-            border-radius: 40px;
-            font-size: 0.8rem;
-            margin-bottom: 20px;
-        }
-        .single-news-title {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-            color: #fff;
-        }
-        .single-news-meta {
-            color: #88aaff;
-            margin-bottom: 30px;
-            font-size: 0.9rem;
-        }
-        .single-news-body {
-            font-size: 1.1rem;
-            line-height: 1.7;
-            color: #ddd;
-            white-space: pre-wrap;
-        }
-        .back-home {
-            display: inline-block;
-            margin-top: 30px;
-            color: #00ffcc;
-            text-decoration: none;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .back-home:hover {
-            text-decoration: underline;
-        }
-
-        .share-news-btn{
-            margin:20px 0;
-            background:#00ffcc22;
-            border:1px solid #00ffcc55;
-            color:#00ffcc;
-            border-radius:10px;
-            padding:10px 14px;
-            cursor:pointer;
-            font-weight:bold;
-        }
-
-        @media (max-width: 700px) {
-            .logo-area h1 { font-size: 1.8rem; }
-            .news-grid { gap: 20px; }
-            .card-title { font-size: 1.2rem; }
-            .single-news-title { font-size: 1.8rem; }
-            .single-news-img { height: 250px; }
-            .single-news-content { padding: 20px; }
-        }
-
-        /* MODAL ADMIN */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.95);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            overflow-y: auto;
-            padding: 20px;
-        }
-
-        .modal-content {
-            background: #0f1219;
-            max-width: 700px;
-            width: 100%;
-            border-radius: 28px;
-            padding: 30px;
-            border: 1px solid #00ffcc;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .modal-content h2, .modal-content h3 {
-            color: #00ffcc;
-            margin: 20px 0 15px 0;
-        }
-
-        .modal-content input, .modal-content textarea, .modal-content select {
-            width: 100%;
-            padding: 12px;
-            margin: 8px 0;
-            background: #1e2432;
-            border: 1px solid #2f3a4a;
-            color: white;
-            border-radius: 12px;
-            font-family: inherit;
-        }
-
-        .modal-content button {
-            background: #00ffcc;
-            color: #000;
-            font-weight: bold;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 40px;
-            cursor: pointer;
-            margin: 5px;
-            transition: 0.2s;
-        }
-        .modal-content button:hover {
-            background: #ff44cc;
-            color: white;
-        }
-
-        .close-modal {
-            float: right;
-            font-size: 28px;
-            cursor: pointer;
-            color: #aaa;
-        }
-
-        .color-input-group {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            flex-wrap: wrap;
-            margin: 10px 0;
-        }
-
-        hr {
-            margin: 20px 0;
-            border-color: #2a3a4a;
-        }
-        .current-value {
-            font-size: 12px;
-            color: #88aaff;
-            margin-bottom: 5px;
-        }
-    
-.logo-wrap{
-    display:inline-flex;
-    align-items:center;
-    gap:10px;
-}
-.logo-icon{
-    font-size:1em;
-    color:initial !important;
-    background:none !important;
-    -webkit-background-clip:border-box !important;
-    -webkit-text-fill-color:initial !important;
-    filter:none !important;
-    text-shadow:none !important;
-}
-.logo-title{
-    background: linear-gradient(135deg, #00ffcc, #ff44cc);
-    -webkit-background-clip:text;
-    background-clip:text;
-    color:transparent;
-    text-shadow:0 0 8px #00ffcc55;
-}
-
-</style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', 'Roboto', 'Merriweather', Georgia, serif; background: #0a0c0f; color: #e0e0e0; line-height: 1.5; }
+        .container { max-width: 1280px; margin: 0 auto; padding: 0 20px; }
+        .site-header { background: #000000dd; backdrop-filter: blur(8px); border-bottom: 3px solid #00ffcc; padding: 20px 0; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+        .header-content { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 15px; }
+        .logo-area h1 { font-size: 2.5rem; letter-spacing: -1px; font-weight: 800; background: linear-gradient(135deg, #00ffcc, #ff44cc); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: 0 0 8px #00ffcc55; }
+        .logo-area p { font-size: 0.85rem; color: #aaa; font-style: italic; }
+        .date-badge { font-family: monospace; background: #1e1e2f; padding: 8px 14px; border-radius: 40px; font-size: 0.8rem; border-left: 3px solid #00ffcc; }
+        .main-nav { background: #11131a; margin-top: 15px; border-radius: 40px; padding: 8px 16px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; }
+        .nav-links { display: flex; gap: 25px; flex-wrap: wrap; list-style: none; }
+        .nav-links li { display: flex; align-items: center; gap: 8px; }
+        .nav-links a { color: #ddd; text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: 0.2s; cursor: pointer; }
+        .nav-links a:hover { color: #00ffcc; }
+        .delete-cat-btn { background: #ff4444aa; border: none; color: white; border-radius: 20px; width: 20px; height: 20px; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .delete-cat-btn:hover { background: #ff0000; transform: scale(1.1); }
+        .admin-only { display: none; }
+        body.admin-mode .admin-only { display: inline-flex; }
+        .news-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; margin: 40px 0; }
+        .news-card { background: #12161f; border-radius: 18px; overflow: hidden; transition: transform 0.2s ease, box-shadow 0.2s; box-shadow: 0 10px 20px -5px rgba(0,0,0,0.5); border: 1px solid #2a2e3a; display: flex; flex-direction: column; position: relative; }
+        .news-card:hover { transform: translateY(-6px); box-shadow: 0 20px 30px -10px #00ffcc20; border-color: #00ffcc60; }
+        .card-img { height: 200px; background-size: cover; background-position: center; background-color: #1f2a3a; position: relative; }
+        .card-category { position: absolute; bottom: 12px; left: 12px; background: #00ffccdd; color: #000; font-weight: bold; padding: 4px 12px; border-radius: 40px; font-size: 0.7rem; backdrop-filter: blur(2px); }
+        .card-content { padding: 20px; flex: 1; display: flex; flex-direction: column; }
+        .card-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 12px; line-height: 1.2; color: #fff; }
+        .card-meta { font-size: 0.75rem; color: #88aaff; margin-bottom: 12px; display: flex; gap: 15px; }
+        .card-excerpt { color: #bbb; margin-bottom: 20px; font-size: 0.9rem; }
+        .read-more { margin-top: auto; color: #00ffcc; font-weight: bold; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+        .delete-news-btn { position: absolute; top: 10px; right: 10px; background: #ff0000cc; border: none; color: white; border-radius: 30px; width: 32px; height: 32px; font-size: 18px; cursor: pointer; z-index: 10; backdrop-filter: blur(4px); transition: 0.2s; }
+        .delete-news-btn:hover { background: #ff0000; transform: scale(1.05); }
+        footer { background: #06080c; text-align: center; padding: 30px 0; margin-top: 40px; border-top: 1px solid #00ffcc30; font-size: 0.8rem; }
+        .secret-watermark { text-align: center; font-size: 10px; margin-top: 15px; opacity: 0.3; cursor: pointer; }
+        .secret-watermark:hover { opacity: 0.8; }
+        .single-news { max-width: 900px; margin: 40px auto; background: #12161f; border-radius: 28px; overflow: hidden; border: 1px solid #2a2e3a; }
+        .single-news-img { width: 100%; height: 400px; background-size: cover; background-position: center; }
+        .single-news-content { padding: 40px; }
+        .single-news-category { display: inline-block; background: #00ffccdd; color: #000; padding: 4px 16px; border-radius: 40px; font-size: 0.8rem; margin-bottom: 20px; }
+        .single-news-title { font-size: 2.5rem; margin-bottom: 20px; color: #fff; }
+        .single-news-meta { color: #88aaff; margin-bottom: 30px; font-size: 0.9rem; }
+        .single-news-body { font-size: 1.1rem; line-height: 1.7; color: #ddd; white-space: pre-wrap; }
+        .back-home { display: inline-block; margin-top: 30px; color: #00ffcc; text-decoration: none; font-weight: bold; cursor: pointer; }
+        .share-news-btn { margin:20px 0; background:#00ffcc22; border:1px solid #00ffcc55; color:#00ffcc; border-radius:10px; padding:10px 14px; cursor:pointer; font-weight:bold; }
+        @media (max-width: 700px) { .logo-area h1 { font-size: 1.8rem; } .news-grid { gap: 20px; } .card-title { font-size: 1.2rem; } .single-news-title { font-size: 1.8rem; } .single-news-img { height: 250px; } .single-news-content { padding: 20px; } }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.95); z-index: 1000; justify-content: center; align-items: center; overflow-y: auto; padding: 20px; }
+        .modal-content { background: #0f1219; max-width: 750px; width: 100%; border-radius: 28px; padding: 30px; border: 1px solid #00ffcc; max-height: 90vh; overflow-y: auto; }
+        .modal-content h2, .modal-content h3 { color: #00ffcc; margin: 20px 0 15px 0; }
+        .modal-content input, .modal-content textarea, .modal-content select { width: 100%; padding: 12px; margin: 8px 0; background: #1e2432; border: 1px solid #2f3a4a; color: white; border-radius: 12px; font-family: inherit; }
+        .modal-content button { background: #00ffcc; color: #000; font-weight: bold; border: none; padding: 10px 20px; border-radius: 40px; cursor: pointer; margin: 5px; transition: 0.2s; }
+        .modal-content button:hover { background: #ff44cc; color: white; }
+        .close-modal { float: right; font-size: 28px; cursor: pointer; color: #aaa; }
+        .color-input-group { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 10px 0; }
+        hr { margin: 20px 0; border-color: #2a3a4a; }
+        .current-value { font-size: 12px; color: #88aaff; margin-bottom: 5px; }
+        .logo-wrap{ display:inline-flex; align-items:center; gap:10px; }
+        .remote-status { background: #1a2a2a; padding: 8px; border-radius: 12px; font-size: 0.8rem; margin: 10px 0; }
+        .btn-warning { background: #ffaa33; color: #000; }
+        .btn-github { background: #2b3b6e; color: white; }
+        .flex-btns { display: flex; gap: 12px; flex-wrap: wrap; margin: 10px 0; }
+    </style>
 </head>
 <body>
 
@@ -482,6 +107,19 @@
         </div>
         
         <div id="adminPanel" style="display:none;">
+            <!-- NUEVA SECCIÓN: GITHUB JSON DATA SOURCE -->
+            <h3>📡 FUENTE DE DATOS (GITHUB / JSON EXTERNO)</h3>
+            <div class="remote-status" id="remoteStatusMsg">
+                💡 Puedes cargar tus datos desde un archivo JSON alojado en GitHub (raw URL)
+            </div>
+            <div class="flex-btns">
+                <input type="text" id="remoteJsonUrl" placeholder="https://raw.githubusercontent.com/tu-user/repo/main/hackers_data.json" style="flex:2">
+                <button id="fetchRemoteDataBtn" style="background:#2b6e4e;">🌍 CARGAR DESDE URL</button>
+                <button id="clearRemoteSourceBtn" class="btn-warning">🗑️ OLVIDAR URL</button>
+            </div>
+            <p style="font-size:12px;">✅ Una vez cargado, los datos se guardan en localStorage automáticamente.<br>
+            🔁 Para mantener sincronía con GitHub: edita datos aquí → usa <strong>📥 Exportar JSON</strong> → súbelo manualmente a tu repositorio (reemplaza el archivo).</p>
+            
             <h3>🏷️ TÍTULO Y LOGO</h3>
             <div class="current-value" id="currentTitleDisplay"></div>
             <input type="text" id="editTitle" placeholder="Nuevo título">
@@ -507,19 +145,19 @@
                 <input type="text" id="newCategoryName" placeholder="Nueva categoría (ej: 🔥 NUEVA)">
                 <button id="addCategoryBtn">➕ Agregar Categoría</button>
             </div>
-            <p style="font-size:12px;">💡 Haz clic en la 'X' junto a cada categoría en el menú principal para eliminarla</p>
             
             <h3>📰 GESTIÓN DE NOTICIAS</h3>
             <div id="newsListAdmin" style="max-height: 300px; overflow-y: auto; background:#1a1e2a; padding:10px; border-radius:12px;"></div>
             <button id="addNewsAdminBtn" style="background:#44ff44; margin-top:10px;">➕ Agregar Nueva Noticia</button>
             
-            <h3>💾 RESPALDO DE DATOS</h3>
-            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                <button id="exportDataBtn" style="background: #00aaff;">📥 Exportar datos (JSON)</button>
-                <label for="importFileInput" style="background: #8855ff; padding: 10px 20px; border-radius: 40px; cursor: pointer; margin: 5px;">📤 Importar datos (JSON)</label>
+            <h3>💾 RESPALDO Y SINCRONÍA CON GITHUB</h3>
+            <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap:wrap;">
+                <button id="exportDataBtn" style="background: #00aaff;">📥 Exportar JSON (para GitHub)</button>
+                <label for="importFileInput" style="background: #8855ff; padding: 10px 20px; border-radius: 40px; cursor: pointer; margin: 5px;">📤 Importar JSON (recuperar backup)</label>
                 <input type="file" id="importFileInput" accept=".json" style="display: none;">
+                <button id="syncInstructionsBtn" style="background:#ff8844;">📘 GUÍA: Subir a GitHub</button>
             </div>
-            <p style="font-size:12px;">⚠️ Exporta una copia de seguridad de todas las noticias y la configuración. Puedes restaurarla más tarde.</p>
+            <p style="font-size:12px;">✅ El JSON exportado es 100% compatible con localStorage y con futuras cargas. Guárdalo en tu repositorio como <strong>hackers_data.json</strong> y luego usa "Cargar desde URL" con la raw URL.</p>
 
             <h3>🦶 PIE DE PÁGINA</h3>
             <div class="current-value" id="currentFooterDisplay"></div>
@@ -556,6 +194,7 @@
     const ADMIN_PASSWORD_HASH = "8f6071792e673977a0de85377bfc24cee7dac0a945e1a350b1235d4fa05abaa9";
     const STORAGE_CONFIG = "hackers_config_final_v6";
     const STORAGE_NEWS = "hackers_news_final_v6";
+    const STORAGE_REMOTE_URL = "hackers_remote_json_url";
     
     function getCategoryKey(displayName) {
         if (displayName === "🏠 PORTADA") return null;
@@ -579,58 +218,14 @@
     
     function setAdminMode(active) {
         isAdminMode = active;
-        if (active) {
-            document.body.classList.add('admin-mode');
-        } else {
-            document.body.classList.remove('admin-mode');
-        }
-        if (currentView === "home") { 
-            renderNav(); 
-            renderNews(); 
-        }
+        active ? document.body.classList.add('admin-mode') : document.body.classList.remove('admin-mode');
+        if (currentView === "home") { renderNav(); renderNews(); }
     }
     
-    function loadData() {
-        const savedConfig = localStorage.getItem(STORAGE_CONFIG);
-        if (savedConfig) siteConfig = JSON.parse(savedConfig);
-        else saveConfig();
-        
-        const savedNews = localStorage.getItem(STORAGE_NEWS);
-        if (savedNews) newsDatabase = JSON.parse(savedNews);
-        else { newsDatabase = JSON.parse(JSON.stringify(DEFAULT_NEWS)); saveNews(); }
-        
-        applyColors();
-        applyBranding();
-        applyFooter();
-        renderNav();
-        showHome();
-        updateDate();
-    }
-    
-    function saveConfig() {
-        localStorage.setItem(STORAGE_CONFIG, JSON.stringify(siteConfig));
-
-        if(window.autoSyncEnabled){
-            uploadToGitHub({
-                config: siteConfig,
-                news: newsDatabase,
-                version: "1.0",
-                exportDate: new Date().toISOString()
-            });
-        }
-    }
-    function saveNews() {
-        localStorage.setItem(STORAGE_NEWS, JSON.stringify(newsDatabase));
-
-        if(window.autoSyncEnabled){
-            uploadToGitHub({
-                config: siteConfig,
-                news: newsDatabase,
-                version: "1.0",
-                exportDate: new Date().toISOString()
-            });
-        }
-    }
+    function saveConfig() { localStorage.setItem(STORAGE_CONFIG, JSON.stringify(siteConfig)); }
+    function saveNews() { localStorage.setItem(STORAGE_NEWS, JSON.stringify(newsDatabase)); }
+    function saveRemoteUrl(url) { if(url) localStorage.setItem(STORAGE_REMOTE_URL, url); else localStorage.removeItem(STORAGE_REMOTE_URL); }
+    function getSavedRemoteUrl() { return localStorage.getItem(STORAGE_REMOTE_URL); }
     
     function applyColors() {
         document.body.style.backgroundColor = siteConfig.colors.bodyBg;
@@ -644,10 +239,7 @@
     
     function applyBranding() {
         const rawTitle = (siteConfig.title || 'HACKERS').replace('🐱‍👤','').trim();
-        document.getElementById('siteTitle').innerHTML =
-        '<span class="logo-wrap"><span class="logo-icon">🐱‍👤</span><span class="logo-title">' +
-        rawTitle +
-        '</span></span>';
+        document.getElementById('siteTitle').innerHTML = '<span class="logo-wrap"><span class="logo-icon">🐱‍👤</span><span class="logo-title">' + rawTitle + '</span></span>';
         document.getElementById('siteSubtitle').innerText = siteConfig.subtitle;
     }
     
@@ -663,35 +255,21 @@
     
     function renderNav() {
         const container = document.getElementById('navLinksContainer');
-        container.innerHTML = siteConfig.categories.map(cat => `
-            <li>
-                <a data-category="${cat}">${cat}</a>
-                <button class="delete-cat-btn admin-only" data-cat="${cat}" title="Eliminar categoría">✖</button>
-            </li>
-        `).join('');
-        
+        container.innerHTML = siteConfig.categories.map(cat => `<li><a data-category="${cat}">${cat}</a><button class="delete-cat-btn admin-only" data-cat="${cat}" title="Eliminar categoría">✖</button></li>`).join('');
         document.querySelectorAll('#navLinksContainer a').forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
                 const catDisplay = link.getAttribute('data-category');
-                if (catDisplay === "🏠 PORTADA") {
-                    currentFilter = null;
-                } else {
-                    currentFilter = getCategoryKey(catDisplay);
-                }
+                currentFilter = (catDisplay === "🏠 PORTADA") ? null : getCategoryKey(catDisplay);
                 showHome();
             });
         });
-        
         document.querySelectorAll('.delete-cat-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const catToDelete = btn.getAttribute('data-cat');
-                if (catToDelete === "🏠 PORTADA") {
-                    alert("No se puede eliminar la sección de portada.");
-                    return;
-                }
-                if(confirm(`¿Eliminar categoría "${catToDelete}" del menú?`)) {
+                if (catToDelete === "🏠 PORTADA") return alert("No se puede eliminar portada.");
+                if(confirm(`¿Eliminar categoría "${catToDelete}"?`)) {
                     siteConfig.categories = siteConfig.categories.filter(c => c !== catToDelete);
                     saveConfig();
                     renderNav();
@@ -705,23 +283,12 @@
     
     function showHome() {
         currentView = "home";
-        
-        // Restaurar estructura original de portada SI venimos desde noticia individual
         const mainContent = document.getElementById('mainContent');
-        if (!document.getElementById('newsContainer')) {
-            mainContent.innerHTML = '<div id="newsContainer" class="news-grid"></div>';
-        }
-        
+        if (!document.getElementById('newsContainer')) mainContent.innerHTML = '<div id="newsContainer" class="news-grid"></div>';
         let filtered = [...newsDatabase].sort((a,b)=>new Date(b.date)-new Date(a.date));
         if(currentFilter) filtered = filtered.filter(n => (n.category||'').toLowerCase().trim() === (currentFilter||'').toLowerCase().trim());
-        
         const container = document.getElementById('newsContainer');
-        
-        if(filtered.length === 0) {
-            container.innerHTML = "<div style='grid-column:1/-1;text-align:center;padding:60px;'>📭 No hay noticias en esta categoría. ¡Agrega desde el panel editorial!</div>";
-            return;
-        }
-        
+        if(filtered.length === 0) { container.innerHTML = "<div style='grid-column:1/-1;text-align:center;padding:60px;'>📭 No hay noticias en esta categoría. ¡Agrega desde el panel editorial!</div>"; return; }
         container.innerHTML = filtered.map(article => `
             <div class="news-card" data-id="${article.id}">
                 <button class="delete-news-btn admin-only" data-id="${article.id}" title="Eliminar noticia">🗑️</button>
@@ -730,198 +297,111 @@
                 </div>
                 <div class="card-content">
                     <h2 class="card-title">${escapeHtml(article.title)}</h2>
-                    <div class="card-meta">
-                        <span>📅 ${new Date(article.date).toLocaleDateString()}</span>
-                        <span>🔮 ${escapeHtml(article.category)}</span>
-                    </div>
+                    <div class="card-meta"><span>📅 ${new Date(article.date).toLocaleDateString()}</span><span>🔮 ${escapeHtml(article.category)}</span></div>
                     <p class="card-excerpt">${escapeHtml(article.excerpt.length > 140 ? article.excerpt.substring(0,140)+'…' : article.excerpt)}</p>
                     <a class="read-more" data-id="${article.id}">Leer noticia completa →</a>
                 </div>
             </div>
         `).join('');
-        
-        document.querySelectorAll('.delete-news-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const id = btn.getAttribute('data-id');
-                if(confirm("Eliminar noticia permanentemente?")) {
-                    newsDatabase = newsDatabase.filter(n => n.id !== id);
-                    saveNews();
-                    showHome();
-                    if(document.getElementById('adminPanel').style.display === 'block') renderNewsListInAdmin();
-                }
-            });
-        });
-        
-        document.querySelectorAll('.read-more').forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const id = link.getAttribute('data-id');
-                showSingleNews(id);
-            });
-        });
-        
+        document.querySelectorAll('.delete-news-btn').forEach(btn => btn.addEventListener('click', (e) => { e.stopPropagation(); const id = btn.getAttribute('data-id'); if(confirm("Eliminar?")) { newsDatabase = newsDatabase.filter(n => n.id !== id); saveNews(); showHome(); if(document.getElementById('adminPanel').style.display === 'block') renderNewsListInAdmin(); } }));
+        document.querySelectorAll('.read-more').forEach(link => link.addEventListener('click', (e) => { e.preventDefault(); showSingleNews(link.getAttribute('data-id')); }));
         document.querySelectorAll('.news-card').forEach(card => card.style.backgroundColor = siteConfig.colors.cardBg);
         document.querySelectorAll('.card-category').forEach(cat => cat.style.backgroundColor = siteConfig.colors.accent + "dd");
-        document.querySelectorAll('.read-more').forEach(link => link.style.color = siteConfig.colors.accent);
     }
     
     function showSingleNews(id) {
         const article = newsDatabase.find(n => n.id === id);
         if(!article) return;
         currentView = "single";
-        
         const mainContent = document.getElementById('mainContent');
-        mainContent.innerHTML = `
-            <div class="single-news">
-                <div class="single-news-img" style="background-image: url('${article.image || 'https://picsum.photos/id/13/900/400'}');"></div>
-                <div class="single-news-content">
-                    <div class="single-news-category">${escapeHtml(article.category)}</div>
-                    <h1 class="single-news-title">${escapeHtml(article.title)}</h1>
-                    <div class="single-news-meta">📅 ${new Date(article.date).toLocaleDateString()}</div>
-                    <div class="single-news-body">${escapeHtml(article.content || article.excerpt)}</div>
-                    <button class="share-news-btn" data-id="${article.id}">📤 Compartir noticia</button><br><a href="#" class="back-home back-home-btn" id="backHomeBtn">← Volver al inicio</a>
-                </div>
-            </div>
-        `;
-        
-        const backButton = document.getElementById('backHomeBtn');
-        if (backButton) {
-            backButton.addEventListener('click', (e) => {
-                e.preventDefault();
-                showHome();
-            });
-        }
-        
-        document.querySelectorAll('.single-news-category').forEach(cat => cat.style.backgroundColor = siteConfig.colors.accent + "dd");
-
-        const shareBtn = document.querySelector('.share-news-btn');
-        if (shareBtn) {
-            shareBtn.addEventListener('click', async () => {
-                const shareUrl = window.location.origin + window.location.pathname + '#news-' + article.id;
-                try {
-                    await navigator.clipboard.writeText(shareUrl);
-                    alert('✅ Link copiado al portapapeles:\n' + shareUrl);
-                } catch(e) {
-                    prompt('Copia este enlace:', shareUrl);
-                }
-            });
-        }
-
-        window.location.hash = 'news-' + article.id;
+        mainContent.innerHTML = `<div class="single-news"><div class="single-news-img" style="background-image: url('${article.image || 'https://picsum.photos/id/13/900/400'}');"></div><div class="single-news-content"><div class="single-news-category">${escapeHtml(article.category)}</div><h1 class="single-news-title">${escapeHtml(article.title)}</h1><div class="single-news-meta">📅 ${new Date(article.date).toLocaleDateString()}</div><div class="single-news-body">${escapeHtml(article.content || article.excerpt)}</div><button class="share-news-btn" data-id="${article.id}">📤 Compartir noticia</button><br><a href="#" class="back-home back-home-btn" id="backHomeBtn">← Volver al inicio</a></div></div>`;
+        document.getElementById('backHomeBtn')?.addEventListener('click', (e) => { e.preventDefault(); showHome(); });
+        document.querySelector('.share-news-btn')?.addEventListener('click', async () => { const shareUrl = window.location.origin + window.location.pathname + '#news-'+article.id; try { await navigator.clipboard.writeText(shareUrl); alert('Link copiado'); } catch(e) { prompt('Copia el enlace:', shareUrl); } });
+        window.location.hash = 'news-'+article.id;
     }
     
-    function renderCategoriesInAdmin() {
-        const div = document.getElementById('categoriesList');
-        div.innerHTML = siteConfig.categories.map(c => `<span style="background:#2a3a4a;padding:4px 12px;border-radius:40px;display:inline-block;margin:4px;">${c}</span>`).join(' ');
-    }
+    function renderCategoriesInAdmin() { document.getElementById('categoriesList').innerHTML = siteConfig.categories.map(c => `<span style="background:#2a3a4a;padding:4px 12px;border-radius:40px;display:inline-block;margin:4px;">${c}</span>`).join(' '); }
     
     function renderNewsListInAdmin() {
         const div = document.getElementById('newsListAdmin');
-        
-        div.innerHTML = newsDatabase.map(n => `
-            <div style="margin:12px 0;background:#0f1219;padding:14px;border-radius:12px;border:1px solid #2a3a4a;">
-                <input type="text" class="edit-news-title" data-id="${n.id}" value="${escapeHtml(n.title)}" style="margin-bottom:8px;font-weight:bold;">
-                
-                <select class="edit-news-category" data-id="${n.id}" style="margin-bottom:8px;">
-${siteConfig.categories.filter(c=>c!=="🏠 PORTADA").map(c=>{
-const val=getCategoryKey(c);
-return `<option value="${val}" ${n.category===val?'selected':''}>${c}</option>`;
-}).join('')}
-</select>
-                
-                <textarea class="edit-news-excerpt" data-id="${n.id}" style="margin-bottom:8px;">${escapeHtml(n.excerpt)}</textarea>
-                
-                <textarea class="edit-news-content" data-id="${n.id}" style="margin-bottom:8px;">${escapeHtml(n.content || '')}</textarea>
-                
-                <input type="text" class="edit-news-image" data-id="${n.id}" value="${escapeHtml(n.image || '')}" style="margin-bottom:10px;">
-                
-                <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                    <button class="saveNewsEditBtn" data-id="${n.id}" style="background:#00cc88;">💾 Guardar cambios</button>
-                    <button class="adminDeleteNewsBtn" data-id="${n.id}" style="background:#ff4444;">🗑️ Eliminar</button>
-                </div>
-            </div>
-        `).join('');
-        
-        document.querySelectorAll('.saveNewsEditBtn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const id = btn.getAttribute('data-id');
-                const newsItem = newsDatabase.find(n => n.id === id);
-                
-                if(newsItem) {
-                    newsItem.title = document.querySelector(`.edit-news-title[data-id="${id}"]`).value;
-                    newsItem.category = document.querySelector(`.edit-news-category[data-id="${id}"]`).value;
-                    newsItem.excerpt = document.querySelector(`.edit-news-excerpt[data-id="${id}"]`).value;
-                    newsItem.content = document.querySelector(`.edit-news-content[data-id="${id}"]`).value;
-                    newsItem.image = document.querySelector(`.edit-news-image[data-id="${id}"]`).value;
-                    
-                    saveNews();
-                    
-                    if(currentView === "home") {
-                        showHome();
-                    } else if(currentView === "single") {
-                        showSingleNews(id);
-                    }
-                    
-                    alert("✅ Noticia actualizada en tiempo real.");
-                }
-            });
-        });
-        
-        document.querySelectorAll('.adminDeleteNewsBtn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const id = btn.getAttribute('data-id');
-                
-                if(confirm("Eliminar noticia?")) {
-                    newsDatabase = newsDatabase.filter(n => n.id !== id);
-                    saveNews();
-                    
-                    if(currentView === "home") showHome();
-                    
-                    renderNewsListInAdmin();
-                }
-            });
-        });
+        div.innerHTML = newsDatabase.map(n => `<div style="margin:12px 0;background:#0f1219;padding:14px;border-radius:12px;border:1px solid #2a3a4a;"><input type="text" class="edit-news-title" data-id="${n.id}" value="${escapeHtml(n.title)}" style="margin-bottom:8px;font-weight:bold;"><select class="edit-news-category" data-id="${n.id}" style="margin-bottom:8px;">${siteConfig.categories.filter(c=>c!=="🏠 PORTADA").map(c=>`<option value="${getCategoryKey(c)}" ${n.category===getCategoryKey(c)?'selected':''}>${c}</option>`).join('')}</select><textarea class="edit-news-excerpt" data-id="${n.id}" style="margin-bottom:8px;">${escapeHtml(n.excerpt)}</textarea><textarea class="edit-news-content" data-id="${n.id}" style="margin-bottom:8px;">${escapeHtml(n.content || '')}</textarea><input type="text" class="edit-news-image" data-id="${n.id}" value="${escapeHtml(n.image || '')}" style="margin-bottom:10px;"><div style="display:flex;gap:10px;"><button class="saveNewsEditBtn" data-id="${n.id}" style="background:#00cc88;">💾 Guardar</button><button class="adminDeleteNewsBtn" data-id="${n.id}" style="background:#ff4444;">🗑️ Eliminar</button></div></div>`).join('');
+        document.querySelectorAll('.saveNewsEditBtn').forEach(btn => btn.addEventListener('click', () => { const id = btn.getAttribute('data-id'); const news = newsDatabase.find(n=>n.id===id); if(news){ news.title=document.querySelector(`.edit-news-title[data-id="${id}"]`).value; news.category=document.querySelector(`.edit-news-category[data-id="${id}"]`).value; news.excerpt=document.querySelector(`.edit-news-excerpt[data-id="${id}"]`).value; news.content=document.querySelector(`.edit-news-content[data-id="${id}"]`).value; news.image=document.querySelector(`.edit-news-image[data-id="${id}"]`).value; saveNews(); if(currentView==="home") showHome(); else if(currentView==="single") showSingleNews(id); alert("Noticia actualizada"); } }));
+        document.querySelectorAll('.adminDeleteNewsBtn').forEach(btn => btn.addEventListener('click', () => { if(confirm("Eliminar noticia?")) { const id = btn.getAttribute('data-id'); newsDatabase = newsDatabase.filter(n => n.id !== id); saveNews(); if(currentView==="home") showHome(); renderNewsListInAdmin(); } }));
     }
     
-    function addNewsFromAdmin() {
-        let title = prompt("Título satírico:");
-        if(!title) return;
-        let category = prompt("Categoría (Hacktivismo, Sátira, Leaks, IA rebelde):", "Hacktivismo");
-        let excerpt = prompt("Extracto / resumen:");
-        let content = prompt("Contenido completo:", excerpt);
-        let image = prompt("URL imagen:", "https://picsum.photos/id/100/400/220");
-        if(title && excerpt) {
-            const newId = Date.now() + "" + Math.random();
-            newsDatabase.unshift({ id: newId, title, category, excerpt, content, image, date: new Date().toISOString() });
-            saveNews();
-            if(currentView === "home") showHome();
-            renderNewsListInAdmin();
-            alert("Noticia agregada!");
+    async function fetchAndApplyRemoteJson(url) {
+        try {
+            const response = await fetch(url);
+            if(!response.ok) throw new Error(`HTTP ${response.status}`);
+            const data = await response.json();
+            if(data.config && data.news && Array.isArray(data.news)) {
+                siteConfig = data.config;
+                newsDatabase = data.news;
+                if(!siteConfig.categories) siteConfig.categories = ["🏠 PORTADA", "💻 HACKTIVISMO", "😂 SÁTIRA", "🔓 LEAKS", "🤖 IA REBELDE"];
+                saveConfig(); saveNews(); saveRemoteUrl(url);
+                applyColors(); applyBranding(); applyFooter(); renderNav();
+                currentFilter = null; showHome();
+                document.getElementById('remoteStatusMsg').innerHTML = `✅ Datos cargados desde: ${url}<br>Última sincronización: ${new Date().toLocaleString()}`;
+                if(document.getElementById('adminPanel').style.display === 'block') { updateAdminDisplayValues(); renderCategoriesInAdmin(); renderNewsListInAdmin(); }
+                alert("¡Datos importados desde GitHub/JSON externo correctamente!");
+                return true;
+            } else throw new Error("Formato inválido (falta config o news)");
+        } catch(err) { alert("Error al cargar JSON remoto: "+err.message); return false; }
+    }
+    
+    function loadData() {
+        const savedConfig = localStorage.getItem(STORAGE_CONFIG);
+        if (savedConfig) siteConfig = JSON.parse(savedConfig);
+        else saveConfig();
+        const savedNews = localStorage.getItem(STORAGE_NEWS);
+        if (savedNews) newsDatabase = JSON.parse(savedNews);
+        else { newsDatabase = JSON.parse(JSON.stringify(DEFAULT_NEWS)); saveNews(); }
+        const remoteUrl = getSavedRemoteUrl();
+        if(remoteUrl) {
+            fetchAndApplyRemoteJson(remoteUrl).then(() => {});
+        } else {
+            applyColors(); applyBranding(); applyFooter(); renderNav(); showHome();
         }
+        updateDate();
+    }
+    
+    function exportData() {
+        const fullData = { config: siteConfig, news: newsDatabase, version: "1.0", exportDate: new Date().toISOString() };
+        const dataStr = JSON.stringify(fullData, null, 2);
+        const blob = new Blob([dataStr], {type: "application/json"});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = `hackers_backup_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.json`;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+        alert("✅ JSON exportado. Puedes subir este archivo a tu repositorio de GitHub y luego usar 'Cargar desde URL' con la raw URL.");
+    }
+    
+    function importData(file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const imported = JSON.parse(e.target.result);
+                if (imported.config && imported.news && Array.isArray(imported.news)) {
+                    siteConfig = imported.config; newsDatabase = imported.news;
+                    if (!siteConfig.categories) siteConfig.categories = ["🏠 PORTADA", "💻 HACKTIVISMO", "😂 SÁTIRA", "🔓 LEAKS", "🤖 IA REBELDE"];
+                    saveConfig(); saveNews();
+                    applyColors(); applyBranding(); applyFooter(); renderNav(); currentFilter = null; showHome();
+                    if(document.getElementById('adminPanel').style.display === 'block') { updateAdminDisplayValues(); renderCategoriesInAdmin(); renderNewsListInAdmin(); }
+                    alert("✅ Datos importados correctamente.");
+                } else alert("Archivo inválido.");
+            } catch (err) { alert("Error: "+err.message); }
+        };
+        reader.readAsText(file);
     }
     
     function resetAll() {
-        if(confirm("RESET TOTAL: restaurar configuración y noticias demo. ¿Continuar?")) {
-            siteConfig = {
-                title: "🐱‍👤 HACKERS",
-                subtitle: "periódico satírico · hacktivismo · cultura glitch",
-                footerText: "Hackers News · Sátira digital y crítica social. Ningún gobierno fue vulnerado (quizás).",
-                watermark: "🔐 [editorial]",
-                colors: { headerBg: "#000000dd", accent: "#00ffcc", bodyBg: "#0a0c0f", textColor: "#e0e0e0", cardBg: "#12161f" },
-                categories: ["🏠 PORTADA", "💻 HACKTIVISMO", "😂 SÁTIRA", "🔓 LEAKS", "🤖 IA REBELDE"]
-            };
+        if(confirm("RESET TOTAL: restaurar datos demo y borrar configuración remota.")) {
+            siteConfig = { title: "🐱‍👤 HACKERS", subtitle: "periódico satírico · hacktivismo · cultura glitch", footerText: "Hackers News · Sátira digital y crítica social. Ningún gobierno fue vulnerado (quizás).", watermark: "🔐 [editorial]", colors: { headerBg: "#000000dd", accent: "#00ffcc", bodyBg: "#0a0c0f", textColor: "#e0e0e0", cardBg: "#12161f" }, categories: ["🏠 PORTADA", "💻 HACKTIVISMO", "😂 SÁTIRA", "🔓 LEAKS", "🤖 IA REBELDE"] };
             newsDatabase = JSON.parse(JSON.stringify(DEFAULT_NEWS));
-            saveConfig(); saveNews();
-            applyColors(); applyBranding(); applyFooter(); renderNav();
-            currentFilter = null;
-            showHome();
-            if(document.getElementById('adminPanel').style.display === 'block') { 
-                renderCategoriesInAdmin(); 
-                renderNewsListInAdmin();
-                updateAdminDisplayValues();
-            }
-            alert("Todo restablecido al estado original.");
+            saveConfig(); saveNews(); localStorage.removeItem(STORAGE_REMOTE_URL);
+            applyColors(); applyBranding(); applyFooter(); renderNav(); currentFilter = null; showHome();
+            if(document.getElementById('adminPanel').style.display === 'block') { updateAdminDisplayValues(); renderCategoriesInAdmin(); renderNewsListInAdmin(); }
+            alert("Todo restablecido a valores originales.");
         }
     }
     
@@ -939,531 +419,40 @@ return `<option value="${val}" ${n.category===val?'selected':''}>${c}</option>`;
         document.getElementById('bodyBgColor').value = siteConfig.colors.bodyBg;
         document.getElementById('textColor').value = siteConfig.colors.textColor;
         document.getElementById('cardBgColor').value = siteConfig.colors.cardBg;
+        document.getElementById('remoteJsonUrl').value = getSavedRemoteUrl() || '';
     }
     
-    function logoutAdmin() {
-
-        isAdminMode = false;
-
-        setAdminMode(false);
-
-        document.getElementById('authSection').style.display = 'block';
-        document.getElementById('adminPanel').style.display = 'none';
-
-        document.getElementById('adminPassword').value = '';
-        document.getElementById('loginError').innerText = '';
-
-        currentFilter = null;
-
-        renderNav();
-        showHome();
-
-        modal.style.display = 'none';
-
-        setTimeout(() => {
-            document.getElementById('adminPanel').style.display = 'none';
-            document.getElementById('authSection').style.display = 'block';
-            document.getElementById('categoriesList').innerHTML = '';
-            document.getElementById('newsListAdmin').innerHTML = '';
-        }, 10);
-
-        alert('✅ Sesión cerrada correctamente');
-    }
+    function logoutAdmin() { isAdminMode=false; setAdminMode(false); document.getElementById('authSection').style.display='block'; document.getElementById('adminPanel').style.display='none'; document.getElementById('adminPassword').value=''; document.getElementById('loginError').innerText=''; currentFilter=null; renderNav(); showHome(); modal.style.display='none'; alert('Sesión cerrada'); }
     
     function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
     
-    // FUNCIONES DE EXPORTACIÓN E IMPORTACIÓN
-    function exportData() {
-        const fullData = {
-            config: siteConfig,
-            news: newsDatabase,
-            version: "1.0",
-            exportDate: new Date().toISOString()
-        };
-        const dataStr = JSON.stringify(fullData, null, 2);
-        const blob = new Blob([dataStr], {type: "application/json"});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `hackers_backup_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        alert("✅ Datos exportados correctamente.");
-    }
-
-    function importData(file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const imported = JSON.parse(e.target.result);
-                // Validar estructura mínima
-                if (imported.config && imported.news && Array.isArray(imported.news)) {
-                    siteConfig = imported.config;
-                    newsDatabase = imported.news;
-                    // Asegurar que las categorías del menú sean compatibles
-                    if (!siteConfig.categories || !Array.isArray(siteConfig.categories)) {
-                        siteConfig.categories = ["🏠 PORTADA", "💻 HACKTIVISMO", "😂 SÁTIRA", "🔓 LEAKS", "🤖 IA REBELDE"];
-                    }
-                    saveConfig();
-                    saveNews();
-                    // Recargar toda la interfaz
-                    applyColors();
-                    applyBranding();
-                    applyFooter();
-                    renderNav();
-                    currentFilter = null;
-                    showHome();
-                    if (document.getElementById('adminPanel').style.display === 'block') {
-                        updateAdminDisplayValues();
-                        renderCategoriesInAdmin();
-                        renderNewsListInAdmin();
-                    }
-                    uploadToGitHub(imported);
-                    alert("✅ Datos importados correctamente y sincronizados con GitHub.");
-                } else {
-                    alert("❌ Archivo inválido: No contiene la estructura esperada.");
-                }
-            } catch (err) {
-                alert("❌ Error al leer el archivo: " + err.message);
-            }
-        };
-        reader.readAsText(file);
-    }
-
-    // MODAL
+    async function sha256(text){ const data = new TextEncoder().encode(text); const hashBuffer = await crypto.subtle.digest('SHA-256', data); return Array.from(new Uint8Array(hashBuffer)).map(b=>b.toString(16).padStart(2,'0')).join(''); }
+    
+    // MODAL & EVENTOS
     const modal = document.getElementById('adminModal');
-    document.getElementById('footerSecretHint').onclick = () => {
-
-        modal.style.display = 'flex';
-
-        if (isAdminMode) {
-
-            document.getElementById('authSection').style.display = 'none';
-            document.getElementById('adminPanel').style.display = 'block';
-
-            requestAnimationFrame(() => {
-                updateAdminDisplayValues();
-                renderCategoriesInAdmin();
-                renderNewsListInAdmin();
-            });
-        }
-    };
+    document.getElementById('footerSecretHint').onclick = () => { modal.style.display = 'flex'; if(isAdminMode) { document.getElementById('authSection').style.display='none'; document.getElementById('adminPanel').style.display='block'; updateAdminDisplayValues(); renderCategoriesInAdmin(); renderNewsListInAdmin(); } };
     document.getElementById('closeModalBtn').onclick = () => modal.style.display = 'none';
     window.onclick = (e) => { if(e.target === modal) modal.style.display = 'none'; };
-    
-    async function sha256(text){
-        const data = new TextEncoder().encode(text);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-        return Array.from(new Uint8Array(hashBuffer)).map(b=>b.toString(16).padStart(2,'0')).join('');
-    }
-
-    document.getElementById('loginBtn').onclick = async () => {
-        const enteredHash = await sha256(document.getElementById('adminPassword').value);
-        if (enteredHash === ADMIN_PASSWORD_HASH) {
-
-            document.getElementById('authSection').style.display = 'none';
-            document.getElementById('adminPanel').style.display = 'block';
-
-            setAdminMode(true);
-
-            requestAnimationFrame(() => {
-                updateAdminDisplayValues();
-                renderCategoriesInAdmin();
-                renderNewsListInAdmin();
-            });
-
-            document.getElementById('loginError').innerText = "";
-        } else {
-            document.getElementById('loginError').innerText = "⛔ Clave incorrecta. Acceso denegado.";
-        }
-    };
-    
-    // Botón cerrar sesión
+    document.getElementById('loginBtn').onclick = async () => { if(await sha256(document.getElementById('adminPassword').value) === ADMIN_PASSWORD_HASH) { document.getElementById('authSection').style.display='none'; document.getElementById('adminPanel').style.display='block'; setAdminMode(true); updateAdminDisplayValues(); renderCategoriesInAdmin(); renderNewsListInAdmin(); } else document.getElementById('loginError').innerText="⛔ Clave incorrecta."; };
     document.getElementById('logoutAdminBtn').onclick = logoutAdmin;
-    
-    document.getElementById('updateBrandBtn').onclick = () => {
-        if(document.getElementById('editTitle').value) siteConfig.title = document.getElementById('editTitle').value;
-        if(document.getElementById('editSubtitle').value) siteConfig.subtitle = document.getElementById('editSubtitle').value;
-        saveConfig(); applyBranding();
-        updateAdminDisplayValues();
-        document.getElementById('editTitle').value = '';
-        document.getElementById('editSubtitle').value = '';
-        alert("Título actualizado.");
-    };
-    
-    document.getElementById('applyColorsBtn').onclick = () => {
-        siteConfig.colors.headerBg = document.getElementById('headerBgColor').value;
-        siteConfig.colors.accent = document.getElementById('accentColor').value;
-        siteConfig.colors.bodyBg = document.getElementById('bodyBgColor').value;
-        siteConfig.colors.textColor = document.getElementById('textColor').value;
-        siteConfig.colors.cardBg = document.getElementById('cardBgColor').value;
-        saveConfig(); applyColors();
-        if(currentView === "home") showHome();
-        alert("Colores actualizados.");
-    };
-    
-    document.getElementById('addCategoryBtn').onclick = () => {
-        let newCat = document.getElementById('newCategoryName').value.trim();
-        if(newCat && !siteConfig.categories.includes(newCat)) {
-            siteConfig.categories.push(newCat);
-            saveConfig(); renderNav(); renderCategoriesInAdmin();
-            document.getElementById('newCategoryName').value = '';
-            alert("Categoría agregada.");
-        } else alert("Categoría inválida o ya existe");
-    };
-    
-    document.getElementById('addNewsAdminBtn').onclick = () => {
-    const editorWindow = window.open('', 'newsEditor', 'width=900,height=800,scrollbars=yes');
-    editorWindow.document.write(`
-    <html><head><title>Nueva noticia</title></head><body style="font-family:Arial;padding:20px">
-    <h2>Nueva noticia</h2>
-    <input id="t" placeholder="Título" style="width:100%;margin:5px"><br>
-    <select id="c" style="width:100%;margin:5px">
-    ${siteConfig.categories.filter(x=>x!=="🏠 PORTADA").map(x=>`<option value="${getCategoryKey(x)}">${x}</option>`).join('')}
-    </select><br>
-    <textarea id="e" placeholder="Extracto" style="width:100%;height:80px"></textarea><br>
-    <textarea id="co" placeholder="Contenido" style="width:100%;height:200px"></textarea><br>
-    <input id="i" placeholder="URL imagen" style="width:100%;margin:5px"><br>
-    <button onclick="window.opener.saveNewsFromPopup(document.getElementById('t').value,document.getElementById('c').value,document.getElementById('e').value,document.getElementById('co').value,document.getElementById('i').value)">Guardar</button>
-    
-<!-- GITHUB AUTO SYNC -->
-<script>
-const GITHUB_SYNC = {
-    owner: "TU_USUARIO",
-    repo: "TU_REPOSITORIO",
-    branch: "main",
-    path: "data.json",
-    token: "PON_AQUI_TU_TOKEN"
-};
-
-async function loadRemoteData() {
-
-    try {
-
-        const url =
-        `https://raw.githubusercontent.com/${GITHUB_SYNC.owner}/${GITHUB_SYNC.repo}/${GITHUB_SYNC.branch}/${GITHUB_SYNC.path}?t=${Date.now()}`;
-
-        const res = await fetch(url);
-
-        if (!res.ok) {
-            console.warn("No existe data.json remoto");
-            loadData();
-            return;
-        }
-
-        const remote = await res.json();
-
-        if (remote.config && remote.news) {
-
-            siteConfig = remote.config;
-            newsDatabase = remote.news;
-
-            localStorage.setItem(STORAGE_CONFIG, JSON.stringify(siteConfig));
-            localStorage.setItem(STORAGE_NEWS, JSON.stringify(newsDatabase));
-
-            applyColors();
-            applyBranding();
-            applyFooter();
-            renderNav();
-
-            currentFilter = null;
-            showHome();
-
-            console.log("Datos cargados desde GitHub");
-
-        } else {
-
-            loadData();
-        }
-
-    } catch(err) {
-
-        console.error(err);
-        loadData();
-    }
-}
-
-async function uploadToGitHub(dataObject) {
-
-    if (
-        !GITHUB_SYNC.token ||
-        GITHUB_SYNC.token.includes("PON_AQUI")
-    ) {
-        console.warn("Debes configurar GitHub Sync");
-        return;
-    }
-
-    try {
-
-        const apiUrl =
-        `https://api.github.com/repos/${GITHUB_SYNC.owner}/${GITHUB_SYNC.repo}/contents/${GITHUB_SYNC.path}`;
-
-        let sha = null;
-
-        const current = await fetch(apiUrl, {
-            headers: {
-                Authorization: `Bearer ${GITHUB_SYNC.token}`,
-                Accept: "application/vnd.github+json"
-            }
-        });
-
-        if (current.ok) {
-            const currentData = await current.json();
-            sha = currentData.sha;
-        }
-
-        const content = btoa(
-            unescape(
-                encodeURIComponent(
-                    JSON.stringify(dataObject, null, 2)
-                )
-            )
-        );
-
-        const body = {
-            message: "Actualizacion automatica",
-            content: content,
-            branch: GITHUB_SYNC.branch
-        };
-
-        if (sha) body.sha = sha;
-
-        const upload = await fetch(apiUrl, {
-            method: "PUT",
-            headers: {
-                Authorization: `Bearer ${GITHUB_SYNC.token}`,
-                "Content-Type": "application/json",
-                Accept: "application/vnd.github+json"
-            },
-            body: JSON.stringify(body)
-        });
-
-        if (!upload.ok) {
-            throw new Error(await upload.text());
-        }
-
-        console.log("GitHub actualizado");
-
-    } catch(err) {
-
-        console.error(err);
-        alert("Error sincronizando GitHub");
-    }
-}
-</script>
-
-</body></html>`);
-}; 
-
-window.saveNewsFromPopup = function(title,category,excerpt,content,image){
- if(title&&excerpt){
-  newsDatabase.unshift({id:Date.now()+''+Math.random(),title,category,excerpt,content,image,date:new Date().toISOString()});
-  saveNews(); showHome(); renderNewsListInAdmin(); alert('Noticia agregada');
- }
-};
-    
-    document.getElementById('updateFooterBtn').onclick = () => {
-        if(document.getElementById('editFooterText').value) siteConfig.footerText = document.getElementById('editFooterText').value;
-        if(document.getElementById('editWatermark').value) siteConfig.watermark = document.getElementById('editWatermark').value;
-        saveConfig(); applyFooter();
-        updateAdminDisplayValues();
-        document.getElementById('editFooterText').value = '';
-        document.getElementById('editWatermark').value = '';
-        alert("Footer actualizado.");
-    };
-    
+    document.getElementById('updateBrandBtn').onclick = () => { if(document.getElementById('editTitle').value) siteConfig.title = document.getElementById('editTitle').value; if(document.getElementById('editSubtitle').value) siteConfig.subtitle = document.getElementById('editSubtitle').value; saveConfig(); applyBranding(); updateAdminDisplayValues(); alert("Título actualizado."); };
+    document.getElementById('applyColorsBtn').onclick = () => { siteConfig.colors.headerBg = document.getElementById('headerBgColor').value; siteConfig.colors.accent = document.getElementById('accentColor').value; siteConfig.colors.bodyBg = document.getElementById('bodyBgColor').value; siteConfig.colors.textColor = document.getElementById('textColor').value; siteConfig.colors.cardBg = document.getElementById('cardBgColor').value; saveConfig(); applyColors(); if(currentView === "home") showHome(); alert("Colores actualizados."); };
+    document.getElementById('addCategoryBtn').onclick = () => { let newCat = document.getElementById('newCategoryName').value.trim(); if(newCat && !siteConfig.categories.includes(newCat)) { siteConfig.categories.push(newCat); saveConfig(); renderNav(); renderCategoriesInAdmin(); document.getElementById('newCategoryName').value=''; alert("Categoría agregada."); } else alert("Inválida o ya existe"); };
+    document.getElementById('addNewsAdminBtn').onclick = () => { const win = window.open('','newsEditor','width=900,height=800'); win.document.write(`<html><head><title>Nueva noticia</title></head><body style="font-family:Arial;padding:20px"><h2>Nueva noticia</h2><input id="t" placeholder="Título" style="width:100%;margin:5px"><br><select id="c" style="width:100%;margin:5px">${siteConfig.categories.filter(x=>x!=="🏠 PORTADA").map(x=>`<option value="${getCategoryKey(x)}">${x}</option>`).join('')}</select><br><textarea id="e" placeholder="Extracto" style="width:100%;height:80px"></textarea><br><textarea id="co" placeholder="Contenido" style="width:100%;height:200px"></textarea><br><input id="i" placeholder="URL imagen" style="width:100%;margin:5px"><br><button onclick="window.opener.saveNewsFromPopup(document.getElementById('t').value,document.getElementById('c').value,document.getElementById('e').value,document.getElementById('co').value,document.getElementById('i').value)">Guardar</button></body></html>`); };
+    window.saveNewsFromPopup = function(t,c,e,co,i){ if(t&&e){ newsDatabase.unshift({id:Date.now()+''+Math.random(), title:t, category:c, excerpt:e, content:co, image:i, date:new Date().toISOString()}); saveNews(); showHome(); renderNewsListInAdmin(); alert('Noticia agregada'); } };
+    document.getElementById('updateFooterBtn').onclick = () => { if(document.getElementById('editFooterText').value) siteConfig.footerText = document.getElementById('editFooterText').value; if(document.getElementById('editWatermark').value) siteConfig.watermark = document.getElementById('editWatermark').value; saveConfig(); applyFooter(); updateAdminDisplayValues(); alert("Footer actualizado."); };
     document.getElementById('resetAllBtn').onclick = resetAll;
-    
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('back-home-btn')) {
-            e.preventDefault();
-            currentFilter = null;
-            showHome();
-        }
-    });
-
-    function openNewsFromHash() {
-        const hash = window.location.hash || '';
-        if(hash.startsWith('#news-')){
-            const id = hash.replace('#news-','');
-            const article = newsDatabase.find(n => n.id === id);
-            if(article) showSingleNews(id);
-        }
-    }
-
-    // EVENTOS DE EXPORTAR/IMPORTAR
     document.getElementById('exportDataBtn').onclick = exportData;
-    document.getElementById('importFileInput').onchange = (e) => {
-        if (e.target.files && e.target.files[0]) {
-            importData(e.target.files[0]);
-        }
-        e.target.value = ''; // Limpiar input para permitir re-importar el mismo archivo si se desea
-    };
-
-    window.autoSyncEnabled = false;
-
-    loadRemoteData();
-
-    openNewsFromHash();
-
-    window.addEventListener('hashchange', openNewsFromHash);
-
-    setTimeout(() => {
-        window.autoSyncEnabled = true;
-    }, 3000);
-
-    updateAdminDisplayValues();
-    renderCategoriesInAdmin();
-    renderNewsListInAdmin();
-    setAdminMode(false);
+    document.getElementById('importFileInput').onchange = (e) => { if(e.target.files[0]) importData(e.target.files[0]); e.target.value=''; };
+    document.getElementById('fetchRemoteDataBtn').onclick = () => { const url = document.getElementById('remoteJsonUrl').value.trim(); if(url) fetchAndApplyRemoteJson(url); else alert("Introduce una URL válida (raw de GitHub)"); };
+    document.getElementById('clearRemoteSourceBtn').onclick = () => { localStorage.removeItem(STORAGE_REMOTE_URL); saveRemoteUrl(''); document.getElementById('remoteJsonUrl').value=''; document.getElementById('remoteStatusMsg').innerHTML='🧹 URL remota olvidada. Ahora usas datos locales.'; alert("Fuente remota eliminada. Los datos actuales permanecen en localStorage."); };
+    document.getElementById('syncInstructionsBtn').onclick = () => { alert("📘 GUÍA PARA GITHUB:\n1. Haz clic en 'Exportar JSON' y guarda el archivo.\n2. Ve a tu repositorio en GitHub → sube/reemplaza el archivo (ej: hackers_data.json).\n3. Obtén la raw URL (botón Raw del archivo).\n4. Pega esa URL en el campo 'Fuente de datos' y presiona 'Cargar desde URL'.\n¡Listo! Cada vez que quieras sincronizar, repite exportación y sube el archivo actualizado."); };
+    
+    loadData();
+    window.addEventListener('hashchange', () => { const hash=window.location.hash; if(hash.startsWith('#news-')) showSingleNews(hash.replace('#news-','')); else if(currentView==="single") showHome(); });
+    if(window.location.hash.startsWith('#news-')) showSingleNews(window.location.hash.replace('#news-',''));
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('keydown', function(e){ const k=(e.key||'').toUpperCase(); if(k==='F12'||(e.ctrlKey&&e.shiftKey&&['I','J','C','K'].includes(k))||(e.ctrlKey&&['U','S'].includes(k))){ e.preventDefault(); e.stopPropagation(); return false; } }, true);
 </script>
-
-<script>
-document.addEventListener('contextmenu', e => e.preventDefault());
-
-document.addEventListener('keydown', function(e){
-    const k = (e.key || '').toUpperCase();
-
-    if (
-        k === 'F12' ||
-        (e.ctrlKey && e.shiftKey && ['I','J','C','K'].includes(k)) ||
-        (e.ctrlKey && ['U','S'].includes(k))
-    ){
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-    }
-}, true);
-</script>
-
-
-<!-- GITHUB AUTO SYNC -->
-<script>
-const GITHUB_SYNC = {
-    owner: "TU_USUARIO",
-    repo: "TU_REPOSITORIO",
-    branch: "main",
-    path: "data.json",
-    token: "PON_AQUI_TU_TOKEN"
-};
-
-async function loadRemoteData() {
-
-    try {
-
-        const url =
-        `https://raw.githubusercontent.com/${GITHUB_SYNC.owner}/${GITHUB_SYNC.repo}/${GITHUB_SYNC.branch}/${GITHUB_SYNC.path}?t=${Date.now()}`;
-
-        const res = await fetch(url);
-
-        if (!res.ok) {
-            console.warn("No existe data.json remoto");
-            loadData();
-            return;
-        }
-
-        const remote = await res.json();
-
-        if (remote.config && remote.news) {
-
-            siteConfig = remote.config;
-            newsDatabase = remote.news;
-
-            localStorage.setItem(STORAGE_CONFIG, JSON.stringify(siteConfig));
-            localStorage.setItem(STORAGE_NEWS, JSON.stringify(newsDatabase));
-
-            applyColors();
-            applyBranding();
-            applyFooter();
-            renderNav();
-
-            currentFilter = null;
-            showHome();
-
-            console.log("Datos cargados desde GitHub");
-
-        } else {
-
-            loadData();
-        }
-
-    } catch(err) {
-
-        console.error(err);
-        loadData();
-    }
-}
-
-async function uploadToGitHub(dataObject) {
-
-    if (
-        !GITHUB_SYNC.token ||
-        GITHUB_SYNC.token.includes("PON_AQUI")
-    ) {
-        console.warn("Debes configurar GitHub Sync");
-        return;
-    }
-
-    try {
-
-        const apiUrl =
-        `https://api.github.com/repos/${GITHUB_SYNC.owner}/${GITHUB_SYNC.repo}/contents/${GITHUB_SYNC.path}`;
-
-        let sha = null;
-
-        const current = await fetch(apiUrl, {
-            headers: {
-                Authorization: `Bearer ${GITHUB_SYNC.token}`,
-                Accept: "application/vnd.github+json"
-            }
-        });
-
-        if (current.ok) {
-            const currentData = await current.json();
-            sha = currentData.sha;
-        }
-
-        const content = btoa(
-            unescape(
-                encodeURIComponent(
-                    JSON.stringify(dataObject, null, 2)
-                )
-            )
-        );
-
-        const body = {
-            message: "Actualizacion automatica",
-            content: content,
-            branch: GITHUB_SYNC.branch
-        };
-
-        if (sha) body.sha = sha;
-
-        const upload = await fetch(apiUrl, {
-            method: "PUT",
-            headers: {
-                Authorization: `Bearer ${GITHUB_SYNC.token}`,
-                "Content-Type": "application/json",
-                Accept: "application/vnd.github+json"
-            },
-            body: JSON.stringify(body)
-        });
-
-        if (!upload.ok) {
-            throw new Error(await upload.text());
-        }
-
-        console.log("GitHub actualizado");
-
-    } catch(err) {
-
-        console.error(err);
-        alert("Error sincronizando GitHub");
-    }
-}
-</script>
-
 </body>
 </html>
