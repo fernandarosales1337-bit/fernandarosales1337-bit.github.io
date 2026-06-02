@@ -20,6 +20,15 @@
   },
   "news": [
     {
+      "id": "17804403601910.5171446402346119",
+      "title": "La lucha digital de Teodardo le racionan la luz 5 horas diarias y ya casi no puede entrar a PlanetAsk",
+      "category": "NACIONALES",
+      "excerpt": "La crisis eléctrica que atraviesa Venezuela golpea ahora no solo a los electrodomésticos y la comida refrigerada, sino también a la vida digital de miles de usuarios. Este es el caso de Teodardo, un fiel miembro de la red social PlanetAsk, quien ve reducida su conexión con el mundo tras la imposición de racionamientos eléctricos de hasta 5 horas diarias en su sector.",
+      "content": "La crisis eléctrica que atraviesa Venezuela golpea ahora no solo a los electrodomésticos y la comida refrigerada, sino también a la vida digital de miles de usuarios. Este es el caso de Teodardo, un fiel miembro de la red social PlanetAsk, quien ve reducida su conexión con el mundo tras la imposición de racionamientos eléctricos de hasta 5 horas diarias en su sector.\n\nTeodardo dice \"ya casi no puedo entrar a PlanetAsk. Cuando llego del trabajo, muchas veces no hay luz. Y cuando vuelve, tengo que priorizar cargar el celular, hacer trabajos o ayudar en la casa. Para cuando termino, a veces ya se vuelve a ir la luz\", explica Teodardo en un mensaje de texto enviado desde su teléfono con apenas 15% de batería.",
+      "image": "https://images2.imgbox.com/b7/d1/yQV5zkge_o.jpg",
+      "date": "2026-06-02T22:46:00.191Z"
+    },
+    {
       "id": "17804366817830.14871784721748638",
       "title": "Gobierno meterá presos a los presos que protesten",
       "category": "NACIONALES",
@@ -75,5 +84,5 @@
     }
   ],
   "version": "1.0",
-  "exportDate": "2026-06-02T22:13:06.185Z"
+  "exportDate": "2026-06-02T22:46:38.170Z"
 }
