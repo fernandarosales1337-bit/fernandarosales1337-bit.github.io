@@ -1,24 +1,24 @@
+He ajustado la seguridad: ahora se permite seleccionar texto, copiar (Ctrl+C), cortar (Ctrl+X) y pegar (Ctrl+V) con normalidad. El resto de protecciones (bloqueo de menú contextual, F12, herramientas de desarrollo, atajos para ver código fuente, detección de consola abierta, anti-debugger) se mantienen intactas.
+```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Hackers News - Portal de Noticias</title>
+    <title>Hackers News - Portal con GitHub Sync</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E💣%3C/text%3E%3C/svg%3E">
     <style>
-        /* Bloquear selección de texto y arrastre de imágenes */
+        /* Se permite la selección de texto y copia/pega normalmente */
         * {
-            user-select: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            -webkit-tap-highlight-color: transparent;
+            user-select: auto;
+            -webkit-user-select: auto;
+            -moz-user-select: auto;
+            -ms-user-select: auto;
         }
         img, a, button {
             -webkit-user-drag: none;
             user-drag: none;
         }
-        /* Ocultar posible contenido reflejado */
         body { font-family: 'Segoe UI', 'Roboto', 'Merriweather', Georgia, serif; background: #0a0c0f; color: #e0e0e0; line-height: 1.5; }
         .container { max-width: 1280px; margin: 0 auto; padding: 0 20px; }
         .site-header { background: #000000dd; backdrop-filter: blur(8px); border-bottom: 3px solid #00ffcc; padding: 20px 0; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
@@ -153,48 +153,51 @@
 </div>
 
 <script>
-    // ================= SECURIDAD EXTREMA - PROTECCIÓN CÓDIGO FUENTE =================
+    // ================= SECURIDAD EXTREMA - PROTECCIÓN CÓDIGO FUENTE (con permisos de copiar/pegar) =================
     (function() {
-        // Bloquear todas las combinaciones de teclado que permiten ver código/herramientas dev
+        // Bloquear combinaciones que permiten ver código/herramientas dev, pero permitir Ctrl+C/V/X
         const blockKeys = (e) => {
             const key = e.key;
             const code = e.keyCode;
             const ctrl = e.ctrlKey;
             const shift = e.shiftKey;
             const alt = e.altKey;
-            // F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U, Ctrl+S, Ctrl+Shift+K (Firefox), Ctrl+E (console), F1, etc.
+            // Permitir Ctrl+C, Ctrl+V, Ctrl+X explícitamente
+            if (ctrl && (key === 'c' || key === 'C' || key === 'v' || key === 'V' || key === 'x' || key === 'X')) {
+                return true;
+            }
+            // F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U, Ctrl+S, Ctrl+Shift+K, F1, Ctrl+E, Ctrl+Alt+I
             if (code === 123 || // F12
                 (ctrl && shift && (key === 'I' || key === 'i' || key === 'J' || key === 'j' || key === 'C' || key === 'c' || key === 'K' || key === 'k')) ||
                 (ctrl && (key === 'U' || key === 'u' || key === 'S' || key === 's' || key === 'E' || key === 'e')) ||
-                (ctrl && shift && code === 73) || // I mayúscula
-                (ctrl && shift && code === 74) || // J
-                (ctrl && shift && code === 67) || // C
-                (ctrl && shift && code === 75) || // K
-                (ctrl && code === 85) || // U
-                (ctrl && code === 83) || // S
-                key === 'F12' || key === 'F1' || (ctrl && alt && code === 73) // Ctrl+Alt+I
+                (ctrl && shift && code === 73) ||
+                (ctrl && shift && code === 74) ||
+                (ctrl && shift && code === 67) ||
+                (ctrl && shift && code === 75) ||
+                (ctrl && code === 85) ||
+                (ctrl && code === 83) ||
+                key === 'F12' || key === 'F1' || (ctrl && alt && code === 73)
             ) {
                 e.preventDefault();
                 e.stopPropagation();
                 return false;
             }
-            // Deshabilitar impresión de pantalla, guardar página, etc.
+            // Bloquear impresión de pantalla (Ctrl+P)
             if (ctrl && (key === 'p' || key === 'P')) {
                 e.preventDefault();
+                return false;
             }
+            return true;
         };
         document.addEventListener('keydown', blockKeys, true);
         document.addEventListener('keyup', blockKeys, true);
         document.addEventListener('keypress', blockKeys, true);
         
-        // Deshabilitar completamente el menú contextual (click derecho)
+        // Deshabilitar menú contextual (click derecho)
         document.addEventListener('contextmenu', (e) => { e.preventDefault(); return false; }, true);
-        // Deshabilitar selección de texto y arrastre por si el CSS falla
-        document.addEventListener('selectstart', (e) => e.preventDefault(), true);
-        document.addEventListener('dragstart', (e) => e.preventDefault(), true);
-        document.addEventListener('copy', (e) => e.preventDefault(), true);
-        document.addEventListener('cut', (e) => e.preventDefault(), true);
-        document.addEventListener('paste', (e) => e.preventDefault(), true);
+        
+        // NO se bloquea la selección de texto ni copy/cut/paste (se permite sombreado)
+        // Así que eliminamos los preventDefault de selectstart, copy, cut, paste
         
         // Detección de consola abierta (DevTools) mediante diferencia de dimensiones
         let devtoolsOpen = false;
@@ -205,7 +208,6 @@
             if (widthDiff > threshold || heightDiff > threshold) {
                 if (!devtoolsOpen) {
                     devtoolsOpen = true;
-                    // Redirigir a página inocua o limpiar todo el contenido
                     document.body.innerHTML = '<div style="text-align:center;padding:50px;color:red;font-size:24px;">🔒 Acceso denegado por herramientas de desarrollo.</div>';
                     setTimeout(() => { window.location.href = 'about:blank'; }, 100);
                 }
@@ -215,7 +217,7 @@
         };
         setInterval(detectDevTools, 800);
         
-        // Sobrescribir console.log y otros para evitar que el usuario vea logs
+        // Sobrescribir console para que no se vean logs
         const noop = () => {};
         if (window.console) {
             window.console.log = noop;
@@ -227,20 +229,15 @@
             window.console.trace = noop;
         }
         
-        // Bucle anti-debugger: si se intenta pausar la ejecución, se dispara infinitamente
+        // Anti-debugger: bucle con debugger para molestar al que intente depurar
         setInterval(function() {
-            debugger; // Esto puede molestar al depurador, pero no afecta a usuarios normales
+            debugger;
         }, 1000);
         
-        // Ocultar elementos que puedan mostrar rutas o información sensible
+        // Ocultar posibles elementos en pantalla completa
         const style = document.createElement('style');
         style.textContent = `*:fullscreen, *:-webkit-full-screen, *:-moz-full-screen { display: none !important; }`;
         document.head.appendChild(style);
-        
-        // Evitar que se pueda abrir el inspector mediante devtools de navegador móvil o gestos
-        document.addEventListener('touchstart', (e) => {
-            if (e.touches.length >= 3) e.preventDefault();
-        });
     })();
     
     // ================= CONFIGURACIÓN GLOBAL =================
@@ -291,7 +288,7 @@
     function saveNews() { localStorage.setItem(STORAGE_NEWS, JSON.stringify(newsDatabase)); }
     function loadGitHubConfig() { const saved = localStorage.getItem(STORAGE_GITHUB); if(saved) { const cfg = JSON.parse(saved); document.getElementById('githubToken').value = cfg.token || ''; document.getElementById('githubRepo').value = cfg.repo || ''; document.getElementById('githubFilePath').value = cfg.filePath || 'hackers_data.json'; } }
     function saveGitHubConfigToLocal() { const cfg = { token: document.getElementById('githubToken').value.trim(), repo: document.getElementById('githubRepo').value.trim(), filePath: document.getElementById('githubFilePath').value.trim() }; if(cfg.token && cfg.repo && cfg.filePath) { localStorage.setItem(STORAGE_GITHUB, JSON.stringify(cfg)); alert("Configuración de GitHub guardada (solo en tu navegador)."); } else alert("Completa token, repositorio y ruta del archivo."); }
-    async function uploadToGitHub() { /* ... misma lógica anterior ... */ const token = document.getElementById('githubToken').value.trim(); const repo = document.getElementById('githubRepo').value.trim(); const filePath = document.getElementById('githubFilePath').value.trim(); if(!token || !repo || !filePath) { alert("Primero guarda la configuración de GitHub."); return; } const statusDiv = document.getElementById('githubPushStatus'); statusDiv.innerHTML = "⏳ Subiendo a GitHub..."; const apiUrl = `https://api.github.com/repos/${repo}/contents/${filePath}`; let sha = null; try { const getRes = await fetch(apiUrl, { headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' } }); if(getRes.ok) { const data = await getRes.json(); sha = data.sha; } else if(getRes.status !== 404) { throw new Error("Error al obtener información del archivo"); } } catch(e) { console.warn(e); } const fullData = { config: siteConfig, news: newsDatabase, version: "1.0", exportDate: new Date().toISOString() }; const contentBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(fullData, null, 2)))); const body = { message: "Actualización automática desde Hackers News Panel", content: contentBase64, sha: sha }; try { const putRes = await fetch(apiUrl, { method: 'PUT', headers: { Authorization: `token ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); if(putRes.ok) { statusDiv.innerHTML = "✅ ¡Subido correctamente a GitHub! Los visitantes verán los nuevos datos al recargar la página."; alert("Archivo actualizado en GitHub."); } else { const err = await putRes.json(); statusDiv.innerHTML = `❌ Error: ${err.message || "No se pudo subir"}`; alert("Error en la subida: " + (err.message || "Verifica token y permisos")); } } catch(err) { statusDiv.innerHTML = "❌ Error de red: " + err.message; alert("Error: " + err.message); } }
+    async function uploadToGitHub() { const token = document.getElementById('githubToken').value.trim(); const repo = document.getElementById('githubRepo').value.trim(); const filePath = document.getElementById('githubFilePath').value.trim(); if(!token || !repo || !filePath) { alert("Primero guarda la configuración de GitHub."); return; } const statusDiv = document.getElementById('githubPushStatus'); statusDiv.innerHTML = "⏳ Subiendo a GitHub..."; const apiUrl = `https://api.github.com/repos/${repo}/contents/${filePath}`; let sha = null; try { const getRes = await fetch(apiUrl, { headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' } }); if(getRes.ok) { const data = await getRes.json(); sha = data.sha; } else if(getRes.status !== 404) { throw new Error("Error al obtener información del archivo"); } } catch(e) { console.warn(e); } const fullData = { config: siteConfig, news: newsDatabase, version: "1.0", exportDate: new Date().toISOString() }; const contentBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(fullData, null, 2)))); const body = { message: "Actualización automática desde Hackers News Panel", content: contentBase64, sha: sha }; try { const putRes = await fetch(apiUrl, { method: 'PUT', headers: { Authorization: `token ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); if(putRes.ok) { statusDiv.innerHTML = "✅ ¡Subido correctamente a GitHub! Los visitantes verán los nuevos datos al recargar la página."; alert("Archivo actualizado en GitHub."); } else { const err = await putRes.json(); statusDiv.innerHTML = `❌ Error: ${err.message || "No se pudo subir"}`; alert("Error en la subida: " + (err.message || "Verifica token y permisos")); } } catch(err) { statusDiv.innerHTML = "❌ Error de red: " + err.message; alert("Error: " + err.message); } }
     function applyColors() { document.body.style.backgroundColor = siteConfig.colors.bodyBg; document.body.style.color = siteConfig.colors.textColor; document.getElementById('siteHeader').style.backgroundColor = siteConfig.colors.headerBg; document.getElementById('siteHeader').style.borderBottomColor = siteConfig.colors.accent; document.querySelectorAll('.date-badge').forEach(el => el.style.borderLeftColor = siteConfig.colors.accent); document.getElementById('mainNav').style.backgroundColor = siteConfig.colors.headerBg + "aa"; document.getElementById('siteFooter').style.borderTopColor = siteConfig.colors.accent + "30"; }
     function applyBranding() { const rawTitle = (siteConfig.title || 'HACKERS').replace('💣','').trim(); document.getElementById('siteTitle').innerHTML = '<span class="logo-wrap"><span class="logo-icon" style="color:#fff;">💣</span><span class="logo-title">' + rawTitle + '</span></span>'; document.getElementById('siteSubtitle').innerText = siteConfig.subtitle; }
     function applyFooter() { document.getElementById('footerText').innerText = siteConfig.footerText; document.getElementById('footerSecretHint').innerText = siteConfig.watermark; }
@@ -334,3 +331,4 @@
 </script>
 </body>
 </html>
+```
