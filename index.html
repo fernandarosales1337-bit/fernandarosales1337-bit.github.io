@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Hackers News - Portal de Noticias con GitHub JSON</title>
+    <title>Hackers News - Datos desde GitHub JSON</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🐱‍👤%3C/text%3E%3C/svg%3E">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -107,18 +107,17 @@
         </div>
         
         <div id="adminPanel" style="display:none;">
-            <!-- NUEVA SECCIÓN: GITHUB JSON DATA SOURCE -->
             <h3>📡 FUENTE DE DATOS (GITHUB / JSON EXTERNO)</h3>
             <div class="remote-status" id="remoteStatusMsg">
-                💡 Puedes cargar tus datos desde un archivo JSON alojado en GitHub (raw URL)
+                🌍 Por defecto se intenta cargar <strong>./hackers_data.json</strong> (mismo directorio).<br>
+                Si existe, todos los visitantes verán esos datos actualizados.
             </div>
             <div class="flex-btns">
                 <input type="text" id="remoteJsonUrl" placeholder="https://raw.githubusercontent.com/tu-user/repo/main/hackers_data.json" style="flex:2">
-                <button id="fetchRemoteDataBtn" style="background:#2b6e4e;">🌍 CARGAR DESDE URL</button>
-                <button id="clearRemoteSourceBtn" class="btn-warning">🗑️ OLVIDAR URL</button>
+                <button id="fetchRemoteDataBtn" style="background:#2b6e4e;">🌍 CARGAR DESDE URL (solo para ti)</button>
+                <button id="clearRemoteSourceBtn" class="btn-warning">🗑️ OLVIDAR URL PERSONAL</button>
             </div>
-            <p style="font-size:12px;">✅ Una vez cargado, los datos se guardan en localStorage automáticamente.<br>
-            🔁 Para mantener sincronía con GitHub: edita datos aquí → usa <strong>📥 Exportar JSON</strong> → súbelo manualmente a tu repositorio (reemplaza el archivo).</p>
+            <p style="font-size:12px;">✅ Para que <strong>TODOS</strong> vean los datos actualizados: exporta el JSON con el botón de abajo y <strong>súbelo como 'hackers_data.json'</strong> en tu repositorio de GitHub (junto a este HTML). Así el sitio lo leerá automáticamente.</p>
             
             <h3>🏷️ TÍTULO Y LOGO</h3>
             <div class="current-value" id="currentTitleDisplay"></div>
@@ -157,7 +156,7 @@
                 <input type="file" id="importFileInput" accept=".json" style="display: none;">
                 <button id="syncInstructionsBtn" style="background:#ff8844;">📘 GUÍA: Subir a GitHub</button>
             </div>
-            <p style="font-size:12px;">✅ El JSON exportado es 100% compatible con localStorage y con futuras cargas. Guárdalo en tu repositorio como <strong>hackers_data.json</strong> y luego usa "Cargar desde URL" con la raw URL.</p>
+            <p style="font-size:12px;">✅ El JSON exportado es 100% compatible con todos los navegadores. Guárdalo como <strong>hackers_data.json</strong> en la raíz de tu repositorio (misma carpeta que este HTML).</p>
 
             <h3>🦶 PIE DE PÁGINA</h3>
             <div class="current-value" id="currentFooterDisplay"></div>
@@ -174,7 +173,7 @@
 </div>
 
 <script>
-    // CONFIGURACIÓN GLOBAL
+    // ================= CONFIGURACIÓN GLOBAL =================
     let siteConfig = {
         title: "🐱‍👤 HACKERS",
         subtitle: "periódico satírico · hacktivismo · cultura glitch",
@@ -195,6 +194,8 @@
     const STORAGE_CONFIG = "hackers_config_final_v6";
     const STORAGE_NEWS = "hackers_news_final_v6";
     const STORAGE_REMOTE_URL = "hackers_remote_json_url";
+    // Ruta por defecto del JSON que estará en el repositorio (todos los usuarios lo leerán)
+    const DEFAULT_REMOTE_JSON_PATH = "./hackers_data.json";
     
     function getCategoryKey(displayName) {
         if (displayName === "🏠 PORTADA") return null;
@@ -329,39 +330,55 @@
         document.querySelectorAll('.adminDeleteNewsBtn').forEach(btn => btn.addEventListener('click', () => { if(confirm("Eliminar noticia?")) { const id = btn.getAttribute('data-id'); newsDatabase = newsDatabase.filter(n => n.id !== id); saveNews(); if(currentView==="home") showHome(); renderNewsListInAdmin(); } }));
     }
     
-    async function fetchAndApplyRemoteJson(url) {
+    // Carga principal: primero intenta obtener el JSON remoto por defecto (./hackers_data.json)
+    // Si existe, lo usa y actualiza localStorage. Si no, usa localStorage o demo.
+    async function loadFromDefaultRemote() {
         try {
-            const response = await fetch(url);
-            if(!response.ok) throw new Error(`HTTP ${response.status}`);
+            const response = await fetch(DEFAULT_REMOTE_JSON_PATH);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
             const data = await response.json();
-            if(data.config && data.news && Array.isArray(data.news)) {
+            if (data.config && data.news && Array.isArray(data.news)) {
                 siteConfig = data.config;
                 newsDatabase = data.news;
-                if(!siteConfig.categories) siteConfig.categories = ["🏠 PORTADA", "💻 HACKTIVISMO", "😂 SÁTIRA", "🔓 LEAKS", "🤖 IA REBELDE"];
-                saveConfig(); saveNews(); saveRemoteUrl(url);
-                applyColors(); applyBranding(); applyFooter(); renderNav();
-                currentFilter = null; showHome();
-                document.getElementById('remoteStatusMsg').innerHTML = `✅ Datos cargados desde: ${url}<br>Última sincronización: ${new Date().toLocaleString()}`;
-                if(document.getElementById('adminPanel').style.display === 'block') { updateAdminDisplayValues(); renderCategoriesInAdmin(); renderNewsListInAdmin(); }
-                alert("¡Datos importados desde GitHub/JSON externo correctamente!");
+                if (!siteConfig.categories) siteConfig.categories = ["🏠 PORTADA", "💻 HACKTIVISMO", "😂 SÁTIRA", "🔓 LEAKS", "🤖 IA REBELDE"];
+                saveConfig(); saveNews();
+                document.getElementById('remoteStatusMsg').innerHTML = `✅ Datos cargados desde ${DEFAULT_REMOTE_JSON_PATH} (sincronizados para todos los usuarios).<br>Última carga: ${new Date().toLocaleString()}`;
                 return true;
-            } else throw new Error("Formato inválido (falta config o news)");
-        } catch(err) { alert("Error al cargar JSON remoto: "+err.message); return false; }
+            }
+        } catch (err) {
+            console.log("No se pudo cargar el JSON por defecto:", err.message);
+            document.getElementById('remoteStatusMsg').innerHTML = `⚠️ No se encontró ${DEFAULT_REMOTE_JSON_PATH}. Usando datos locales (demo o localStorage).<br>Sube un archivo exportado como 'hackers_data.json' para que todos los visitantes lo vean.`;
+        }
+        return false;
     }
     
-    function loadData() {
-        const savedConfig = localStorage.getItem(STORAGE_CONFIG);
-        if (savedConfig) siteConfig = JSON.parse(savedConfig);
-        else saveConfig();
-        const savedNews = localStorage.getItem(STORAGE_NEWS);
-        if (savedNews) newsDatabase = JSON.parse(savedNews);
-        else { newsDatabase = JSON.parse(JSON.stringify(DEFAULT_NEWS)); saveNews(); }
-        const remoteUrl = getSavedRemoteUrl();
-        if(remoteUrl) {
-            fetchAndApplyRemoteJson(remoteUrl).then(() => {});
-        } else {
-            applyColors(); applyBranding(); applyFooter(); renderNav(); showHome();
+    async function loadData() {
+        // 1. Intentar cargar desde el JSON por defecto del repositorio (para que todos los usuarios compartan datos)
+        const remoteLoaded = await loadFromDefaultRemote();
+        if (!remoteLoaded) {
+            // 2. Fallback: localStorage o demo
+            const savedConfig = localStorage.getItem(STORAGE_CONFIG);
+            if (savedConfig) siteConfig = JSON.parse(savedConfig);
+            else saveConfig();
+            const savedNews = localStorage.getItem(STORAGE_NEWS);
+            if (savedNews) newsDatabase = JSON.parse(savedNews);
+            else { newsDatabase = JSON.parse(JSON.stringify(DEFAULT_NEWS)); saveNews(); }
         }
+        // 3. Si existe una URL remota personal guardada (por si el admin quiere probar otra fuente), se puede aplicar pero no es obligatoria.
+        const personalUrl = getSavedRemoteUrl();
+        if (personalUrl && personalUrl !== DEFAULT_REMOTE_JSON_PATH) {
+            const response = await fetch(personalUrl).catch(()=>null);
+            if (response && response.ok) {
+                const data = await response.json();
+                if (data.config && data.news) {
+                    siteConfig = data.config; newsDatabase = data.news;
+                    if (!siteConfig.categories) siteConfig.categories = ["🏠 PORTADA", "💻 HACKTIVISMO", "😂 SÁTIRA", "🔓 LEAKS", "🤖 IA REBELDE"];
+                    saveConfig(); saveNews();
+                    document.getElementById('remoteStatusMsg').innerHTML = `📌 Usando URL personal: ${personalUrl}`;
+                }
+            }
+        }
+        applyColors(); applyBranding(); applyFooter(); renderNav(); showHome();
         updateDate();
     }
     
@@ -371,9 +388,9 @@
         const blob = new Blob([dataStr], {type: "application/json"});
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
-        a.href = url; a.download = `hackers_backup_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.json`;
+        a.href = url; a.download = `hackers_data.json`;  // nombre sugerido para subir a GitHub
         document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
-        alert("✅ JSON exportado. Puedes subir este archivo a tu repositorio de GitHub y luego usar 'Cargar desde URL' con la raw URL.");
+        alert("✅ JSON exportado. Guarda este archivo como 'hackers_data.json' y súbelo a tu repositorio de GitHub (misma carpeta que este HTML).");
     }
     
     function importData(file) {
@@ -392,6 +409,24 @@
             } catch (err) { alert("Error: "+err.message); }
         };
         reader.readAsText(file);
+    }
+    
+    async function fetchAndApplyRemoteJson(url) {
+        try {
+            const response = await fetch(url);
+            if(!response.ok) throw new Error(`HTTP ${response.status}`);
+            const data = await response.json();
+            if(data.config && data.news && Array.isArray(data.news)) {
+                siteConfig = data.config; newsDatabase = data.news;
+                if(!siteConfig.categories) siteConfig.categories = ["🏠 PORTADA", "💻 HACKTIVISMO", "😂 SÁTIRA", "🔓 LEAKS", "🤖 IA REBELDE"];
+                saveConfig(); saveNews(); saveRemoteUrl(url);
+                applyColors(); applyBranding(); applyFooter(); renderNav(); currentFilter = null; showHome();
+                if(document.getElementById('adminPanel').style.display === 'block') { updateAdminDisplayValues(); renderCategoriesInAdmin(); renderNewsListInAdmin(); }
+                document.getElementById('remoteStatusMsg').innerHTML = `✅ Datos cargados desde URL personal: ${url}`;
+                alert("Datos cargados desde URL externa (solo para tu navegador).");
+                return true;
+            } else throw new Error("Formato inválido");
+        } catch(err) { alert("Error al cargar JSON remoto: "+err.message); return false; }
     }
     
     function resetAll() {
@@ -445,8 +480,8 @@
     document.getElementById('exportDataBtn').onclick = exportData;
     document.getElementById('importFileInput').onchange = (e) => { if(e.target.files[0]) importData(e.target.files[0]); e.target.value=''; };
     document.getElementById('fetchRemoteDataBtn').onclick = () => { const url = document.getElementById('remoteJsonUrl').value.trim(); if(url) fetchAndApplyRemoteJson(url); else alert("Introduce una URL válida (raw de GitHub)"); };
-    document.getElementById('clearRemoteSourceBtn').onclick = () => { localStorage.removeItem(STORAGE_REMOTE_URL); saveRemoteUrl(''); document.getElementById('remoteJsonUrl').value=''; document.getElementById('remoteStatusMsg').innerHTML='🧹 URL remota olvidada. Ahora usas datos locales.'; alert("Fuente remota eliminada. Los datos actuales permanecen en localStorage."); };
-    document.getElementById('syncInstructionsBtn').onclick = () => { alert("📘 GUÍA PARA GITHUB:\n1. Haz clic en 'Exportar JSON' y guarda el archivo.\n2. Ve a tu repositorio en GitHub → sube/reemplaza el archivo (ej: hackers_data.json).\n3. Obtén la raw URL (botón Raw del archivo).\n4. Pega esa URL en el campo 'Fuente de datos' y presiona 'Cargar desde URL'.\n¡Listo! Cada vez que quieras sincronizar, repite exportación y sube el archivo actualizado."); };
+    document.getElementById('clearRemoteSourceBtn').onclick = () => { localStorage.removeItem(STORAGE_REMOTE_URL); saveRemoteUrl(''); document.getElementById('remoteJsonUrl').value=''; document.getElementById('remoteStatusMsg').innerHTML='🧹 URL personal olvidada. Ahora usas el JSON por defecto si existe.'; alert("Fuente personal eliminada."); };
+    document.getElementById('syncInstructionsBtn').onclick = () => { alert("📘 GUÍA PARA COMPARTIR DATOS ACTUALIZADOS:\n1. En el panel, haz clic en 'Exportar JSON' → se descargará 'hackers_data.json'.\n2. Sube ese archivo a tu repositorio de GitHub (en la misma carpeta donde está este HTML).\n3. Si usas GitHub Pages, todos los visitantes verán automáticamente los datos actualizados al cargar la página.\n4. Si quieres otra ubicación, cambia la constante DEFAULT_REMOTE_JSON_PATH en el código."); };
     
     loadData();
     window.addEventListener('hashchange', () => { const hash=window.location.hash; if(hash.startsWith('#news-')) showSingleNews(hash.replace('#news-','')); else if(currentView==="single") showHome(); });
