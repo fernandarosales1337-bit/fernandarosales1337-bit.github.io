@@ -20,13 +20,22 @@
   },
   "news": [
     {
-      "id": "17804307797250.81642148074419",
+      "id": "17804313663890.18025626967644748",
       "title": "Hacker UniPro toma el control de cámaras en aspiradoras robot y expone vulnerabilidad masiva",
       "category": "HACKTIVISMO",
       "excerpt": "Un nuevo actor en el mundo de la ciberseguridad ha encendido todas las alarmas. Bajo el alias UniPro, este hacker emergente logró infiltrarse en los sistemas de múltiples modelos de aspiradoras robot con cámara integrada, tomando control remoto de los dispositivos y accediendo a transmisiones de video en tiempo real desde el interior de hogares particulares.",
       "content": "Un nuevo actor en el mundo de la ciberseguridad ha encendido todas las alarmas. Bajo el alias UniPro, este hacker emergente logró infiltrarse en los sistemas de múltiples modelos de aspiradoras robot con cámara integrada, tomando control remoto de los dispositivos y accediendo a transmisiones de video en tiempo real desde el interior de hogares particulares.\n\nEl hallazgo, que inicialmente circuló en foros especializados de white hat (hackers éticos), fue confirmado tras una investigación independiente que detectó patrones anómalos en el tráfico de datos de decenas de aspiradoras de distintas marcas económicas. UniPro habría explotado una vulnerabilidad crítica en el protocolo de autenticación de los dispositivos, permitiéndole no solo ver a través de las cámaras, sino también mover los aparatos de forma remota.\n\nSegún las primeras pesquisas, UniPro habría publicado en una darknet una breve pero contundente demostración de clips de segundos donde se ven salas de estar, cocinas y dormitorios, todos captados desde la perspectiva de una aspiradora robot. El hacker asegura que solo expuso imágenes genéricas sin datos personales identificables para \"no causar daños reales\", pero advierte que el fallo sigue sin parchear en muchos modelos económicos.",
       "image": "https://images2.imgbox.com/69/ce/sBgWcOyz_o.jpg",
-      "date": "2026-06-02T20:06:19.725Z"
+      "date": "2026-06-02T20:16:06.390Z"
+    },
+    {
+      "id": "17804304107650.3832444116685748",
+      "title": "Frikyta deslumbra al cantar en su muro y recibe lluvia de elogios",
+      "category": "NACIONALES",
+      "excerpt": "La red social de preguntas y respuestas PlanetAsk se ha convertido inesperadamente en un escenario musical tras la publicación de un audio en el muro de la popular usuaria Frikyta. En la grabación, que ya supera el millón de reproducciones en pocas horas, se puede ver a la joven interpretando un fragmento de una canción con una calidad vocal que ha dejado boquiabiertos a sus seguidores.",
+      "content": "La red social de preguntas y respuestas PlanetAsk se ha convertido inesperadamente en un escenario musical tras la publicación de un audio en el muro de la popular usuaria Frikyta. En la grabación, que ya supera el millón de reproducciones en pocas horas, se puede ver a la joven interpretando un fragmento de una canción con una calidad vocal que ha dejado boquiabiertos a sus seguidores.\n\n“No sabía que cantaba así”, “Voz de ángel” o “Frikyta, necesitamos un disco ya” son algunos de los comentarios que inundan la publicación. Lo que comenzó como una anécdota espontánea en su perfil se convirtió rápidamente en tendencia, con cientos de usuarios compartiendo el audio y pidiendo un directo exclusivo para escucharla más tiempo.",
+      "image": "https://images2.imgbox.com/f4/d5/XetcIDFJ_o.jpg",
+      "date": "2026-06-02T20:00:10.765Z"
     },
     {
       "id": "17804157632030.7448761439054585",
@@ -66,5 +75,5 @@
     }
   ],
   "version": "1.0",
-  "exportDate": "2026-06-02T20:06:48.068Z"
+  "exportDate": "2026-06-02T20:16:41.782Z"
 }
