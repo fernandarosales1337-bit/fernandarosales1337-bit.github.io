@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Hackers News - Datos desde GitHub JSON</title>
+    <title>Hackers News - Portal con GitHub Sync</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🐱‍👤%3C/text%3E%3C/svg%3E">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -49,7 +49,7 @@
         .share-news-btn { margin:20px 0; background:#00ffcc22; border:1px solid #00ffcc55; color:#00ffcc; border-radius:10px; padding:10px 14px; cursor:pointer; font-weight:bold; }
         @media (max-width: 700px) { .logo-area h1 { font-size: 1.8rem; } .news-grid { gap: 20px; } .card-title { font-size: 1.2rem; } .single-news-title { font-size: 1.8rem; } .single-news-img { height: 250px; } .single-news-content { padding: 20px; } }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.95); z-index: 1000; justify-content: center; align-items: center; overflow-y: auto; padding: 20px; }
-        .modal-content { background: #0f1219; max-width: 750px; width: 100%; border-radius: 28px; padding: 30px; border: 1px solid #00ffcc; max-height: 90vh; overflow-y: auto; }
+        .modal-content { background: #0f1219; max-width: 800px; width: 100%; border-radius: 28px; padding: 30px; border: 1px solid #00ffcc; max-height: 90vh; overflow-y: auto; }
         .modal-content h2, .modal-content h3 { color: #00ffcc; margin: 20px 0 15px 0; }
         .modal-content input, .modal-content textarea, .modal-content select { width: 100%; padding: 12px; margin: 8px 0; background: #1e2432; border: 1px solid #2f3a4a; color: white; border-radius: 12px; font-family: inherit; }
         .modal-content button { background: #00ffcc; color: #000; font-weight: bold; border: none; padding: 10px 20px; border-radius: 40px; cursor: pointer; margin: 5px; transition: 0.2s; }
@@ -61,8 +61,8 @@
         .logo-wrap{ display:inline-flex; align-items:center; gap:10px; }
         .remote-status { background: #1a2a2a; padding: 8px; border-radius: 12px; font-size: 0.8rem; margin: 10px 0; }
         .btn-warning { background: #ffaa33; color: #000; }
-        .btn-github { background: #2b3b6e; color: white; }
         .flex-btns { display: flex; gap: 12px; flex-wrap: wrap; margin: 10px 0; }
+        .github-section { border: 1px solid #00ffcc55; border-radius: 16px; padding: 12px; margin-top: 10px; background: #0a0e14; }
     </style>
 </head>
 <body>
@@ -107,17 +107,29 @@
         </div>
         
         <div id="adminPanel" style="display:none;">
-            <h3>📡 FUENTE DE DATOS (GITHUB / JSON EXTERNO)</h3>
+            <!-- NUEVA SECCIÓN: SUBIDA AUTOMÁTICA A GITHUB -->
+            <h3>🚀 SUBIR A GITHUB AUTOMÁTICAMENTE</h3>
+            <div class="github-section">
+                <div class="flex-btns">
+                    <input type="text" id="githubToken" placeholder="GitHub Personal Access Token (classic, con repo)" style="flex:2">
+                    <input type="text" id="githubRepo" placeholder="usuario/repo" style="flex:1" value="">
+                    <input type="text" id="githubFilePath" placeholder="ruta/archivo.json" style="flex:1" value="hackers_data.json">
+                </div>
+                <div class="flex-btns">
+                    <button id="saveGitHubConfigBtn" style="background:#2b6e4e;">💾 Guardar configuración GitHub</button>
+                    <button id="pushToGitHubBtn" style="background:#ff8800;">📤 Subir a GitHub ahora</button>
+                </div>
+                <div id="githubPushStatus" style="font-size:12px; margin-top:8px; color:#aaa;"></div>
+                <p style="font-size:11px; margin-top:8px;">✅ El token y repo se guardan solo en tu navegador (localStorage). <br>
+                🔁 Al hacer clic en "Subir a GitHub", se sobreescribirá el archivo en tu repositorio con los datos actuales (config + noticias).<br>
+                🌍 Luego, todos los visitantes verán los nuevos datos porque el sitio carga <strong>./hackers_data.json</strong> automáticamente.</p>
+            </div>
+            
+            <h3>📡 FUENTE DE DATOS PREDETERMINADA</h3>
             <div class="remote-status" id="remoteStatusMsg">
-                🌍 Por defecto se intenta cargar <strong>./hackers_data.json</strong> (mismo directorio).<br>
-                Si existe, todos los visitantes verán esos datos actualizados.
+                🌍 Por defecto se carga <strong>./hackers_data.json</strong> (misma carpeta).<br>
+                Si ese archivo existe (subido vía GitHub), todos los usuarios lo verán.
             </div>
-            <div class="flex-btns">
-                <input type="text" id="remoteJsonUrl" placeholder="https://raw.githubusercontent.com/tu-user/repo/main/hackers_data.json" style="flex:2">
-                <button id="fetchRemoteDataBtn" style="background:#2b6e4e;">🌍 CARGAR DESDE URL (solo para ti)</button>
-                <button id="clearRemoteSourceBtn" class="btn-warning">🗑️ OLVIDAR URL PERSONAL</button>
-            </div>
-            <p style="font-size:12px;">✅ Para que <strong>TODOS</strong> vean los datos actualizados: exporta el JSON con el botón de abajo y <strong>súbelo como 'hackers_data.json'</strong> en tu repositorio de GitHub (junto a este HTML). Así el sitio lo leerá automáticamente.</p>
             
             <h3>🏷️ TÍTULO Y LOGO</h3>
             <div class="current-value" id="currentTitleDisplay"></div>
@@ -149,14 +161,12 @@
             <div id="newsListAdmin" style="max-height: 300px; overflow-y: auto; background:#1a1e2a; padding:10px; border-radius:12px;"></div>
             <button id="addNewsAdminBtn" style="background:#44ff44; margin-top:10px;">➕ Agregar Nueva Noticia</button>
             
-            <h3>💾 RESPALDO Y SINCRONÍA CON GITHUB</h3>
-            <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap:wrap;">
+            <h3>💾 RESPALDO LOCAL</h3>
+            <div class="flex-btns">
                 <button id="exportDataBtn" style="background: #00aaff;">📥 Exportar JSON (para GitHub)</button>
-                <label for="importFileInput" style="background: #8855ff; padding: 10px 20px; border-radius: 40px; cursor: pointer; margin: 5px;">📤 Importar JSON (recuperar backup)</label>
+                <label for="importFileInput" style="background: #8855ff; padding: 10px 20px; border-radius: 40px; cursor: pointer;">📤 Importar JSON (recuperar backup)</label>
                 <input type="file" id="importFileInput" accept=".json" style="display: none;">
-                <button id="syncInstructionsBtn" style="background:#ff8844;">📘 GUÍA: Subir a GitHub</button>
             </div>
-            <p style="font-size:12px;">✅ El JSON exportado es 100% compatible con todos los navegadores. Guárdalo como <strong>hackers_data.json</strong> en la raíz de tu repositorio (misma carpeta que este HTML).</p>
 
             <h3>🦶 PIE DE PÁGINA</h3>
             <div class="current-value" id="currentFooterDisplay"></div>
@@ -193,8 +203,7 @@
     const ADMIN_PASSWORD_HASH = "8f6071792e673977a0de85377bfc24cee7dac0a945e1a350b1235d4fa05abaa9";
     const STORAGE_CONFIG = "hackers_config_final_v6";
     const STORAGE_NEWS = "hackers_news_final_v6";
-    const STORAGE_REMOTE_URL = "hackers_remote_json_url";
-    // Ruta por defecto del JSON que estará en el repositorio (todos los usuarios lo leerán)
+    const STORAGE_GITHUB = "hackers_github_config";
     const DEFAULT_REMOTE_JSON_PATH = "./hackers_data.json";
     
     function getCategoryKey(displayName) {
@@ -217,6 +226,7 @@
     let currentFilter = null;
     let currentView = "home";
     
+    // ================= FUNCIONES AUXILIARES =================
     function setAdminMode(active) {
         isAdminMode = active;
         active ? document.body.classList.add('admin-mode') : document.body.classList.remove('admin-mode');
@@ -225,8 +235,87 @@
     
     function saveConfig() { localStorage.setItem(STORAGE_CONFIG, JSON.stringify(siteConfig)); }
     function saveNews() { localStorage.setItem(STORAGE_NEWS, JSON.stringify(newsDatabase)); }
-    function saveRemoteUrl(url) { if(url) localStorage.setItem(STORAGE_REMOTE_URL, url); else localStorage.removeItem(STORAGE_REMOTE_URL); }
-    function getSavedRemoteUrl() { return localStorage.getItem(STORAGE_REMOTE_URL); }
+    
+    function loadGitHubConfig() {
+        const saved = localStorage.getItem(STORAGE_GITHUB);
+        if(saved) {
+            const cfg = JSON.parse(saved);
+            document.getElementById('githubToken').value = cfg.token || '';
+            document.getElementById('githubRepo').value = cfg.repo || '';
+            document.getElementById('githubFilePath').value = cfg.filePath || 'hackers_data.json';
+        }
+    }
+    function saveGitHubConfigToLocal() {
+        const cfg = {
+            token: document.getElementById('githubToken').value.trim(),
+            repo: document.getElementById('githubRepo').value.trim(),
+            filePath: document.getElementById('githubFilePath').value.trim()
+        };
+        if(cfg.token && cfg.repo && cfg.filePath) {
+            localStorage.setItem(STORAGE_GITHUB, JSON.stringify(cfg));
+            alert("Configuración de GitHub guardada (solo en tu navegador).");
+        } else alert("Completa token, repositorio y ruta del archivo.");
+    }
+    
+    async function uploadToGitHub() {
+        const token = document.getElementById('githubToken').value.trim();
+        const repo = document.getElementById('githubRepo').value.trim();
+        const filePath = document.getElementById('githubFilePath').value.trim();
+        if(!token || !repo || !filePath) {
+            alert("Primero guarda la configuración de GitHub.");
+            return;
+        }
+        const statusDiv = document.getElementById('githubPushStatus');
+        statusDiv.innerHTML = "⏳ Subiendo a GitHub...";
+        
+        // Obtener el SHA actual del archivo (si existe) para actualizarlo
+        const apiUrl = `https://api.github.com/repos/${repo}/contents/${filePath}`;
+        let sha = null;
+        try {
+            const getRes = await fetch(apiUrl, {
+                headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
+            });
+            if(getRes.ok) {
+                const data = await getRes.json();
+                sha = data.sha;
+            } else if(getRes.status !== 404) {
+                throw new Error("Error al obtener información del archivo");
+            }
+        } catch(e) { console.warn(e); }
+        
+        // Preparar contenido: el JSON completo con config y noticias actuales
+        const fullData = {
+            config: siteConfig,
+            news: newsDatabase,
+            version: "1.0",
+            exportDate: new Date().toISOString()
+        };
+        const contentBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(fullData, null, 2))));
+        const body = {
+            message: "Actualización automática desde Hackers News Panel",
+            content: contentBase64,
+            sha: sha
+        };
+        
+        try {
+            const putRes = await fetch(apiUrl, {
+                method: 'PUT',
+                headers: { Authorization: `token ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            if(putRes.ok) {
+                statusDiv.innerHTML = "✅ ¡Subido correctamente a GitHub! Los visitantes verán los nuevos datos al recargar la página.";
+                alert("Archivo actualizado en GitHub. Recuerda que el sitio lee ./hackers_data.json por defecto.");
+            } else {
+                const err = await putRes.json();
+                statusDiv.innerHTML = `❌ Error: ${err.message || "No se pudo subir"}`;
+                alert("Error en la subida: " + (err.message || "Verifica token y permisos"));
+            }
+        } catch(err) {
+            statusDiv.innerHTML = "❌ Error de red: " + err.message;
+            alert("Error: " + err.message);
+        }
+    }
     
     function applyColors() {
         document.body.style.backgroundColor = siteConfig.colors.bodyBg;
@@ -321,17 +410,40 @@
         window.location.hash = 'news-'+article.id;
     }
     
-    function renderCategoriesInAdmin() { document.getElementById('categoriesList').innerHTML = siteConfig.categories.map(c => `<span style="background:#2a3a4a;padding:4px 12px;border-radius:40px;display:inline-block;margin:4px;">${c}</span>`).join(' '); }
+    function renderCategoriesInAdmin() { 
+        document.getElementById('categoriesList').innerHTML = siteConfig.categories.map(c => `<span style="background:#2a3a4a;padding:4px 12px;border-radius:40px;display:inline-block;margin:4px;">${c}</span>`).join(' '); 
+    }
     
     function renderNewsListInAdmin() {
         const div = document.getElementById('newsListAdmin');
         div.innerHTML = newsDatabase.map(n => `<div style="margin:12px 0;background:#0f1219;padding:14px;border-radius:12px;border:1px solid #2a3a4a;"><input type="text" class="edit-news-title" data-id="${n.id}" value="${escapeHtml(n.title)}" style="margin-bottom:8px;font-weight:bold;"><select class="edit-news-category" data-id="${n.id}" style="margin-bottom:8px;">${siteConfig.categories.filter(c=>c!=="🏠 PORTADA").map(c=>`<option value="${getCategoryKey(c)}" ${n.category===getCategoryKey(c)?'selected':''}>${c}</option>`).join('')}</select><textarea class="edit-news-excerpt" data-id="${n.id}" style="margin-bottom:8px;">${escapeHtml(n.excerpt)}</textarea><textarea class="edit-news-content" data-id="${n.id}" style="margin-bottom:8px;">${escapeHtml(n.content || '')}</textarea><input type="text" class="edit-news-image" data-id="${n.id}" value="${escapeHtml(n.image || '')}" style="margin-bottom:10px;"><div style="display:flex;gap:10px;"><button class="saveNewsEditBtn" data-id="${n.id}" style="background:#00cc88;">💾 Guardar</button><button class="adminDeleteNewsBtn" data-id="${n.id}" style="background:#ff4444;">🗑️ Eliminar</button></div></div>`).join('');
-        document.querySelectorAll('.saveNewsEditBtn').forEach(btn => btn.addEventListener('click', () => { const id = btn.getAttribute('data-id'); const news = newsDatabase.find(n=>n.id===id); if(news){ news.title=document.querySelector(`.edit-news-title[data-id="${id}"]`).value; news.category=document.querySelector(`.edit-news-category[data-id="${id}"]`).value; news.excerpt=document.querySelector(`.edit-news-excerpt[data-id="${id}"]`).value; news.content=document.querySelector(`.edit-news-content[data-id="${id}"]`).value; news.image=document.querySelector(`.edit-news-image[data-id="${id}"]`).value; saveNews(); if(currentView==="home") showHome(); else if(currentView==="single") showSingleNews(id); alert("Noticia actualizada"); } }));
-        document.querySelectorAll('.adminDeleteNewsBtn').forEach(btn => btn.addEventListener('click', () => { if(confirm("Eliminar noticia?")) { const id = btn.getAttribute('data-id'); newsDatabase = newsDatabase.filter(n => n.id !== id); saveNews(); if(currentView==="home") showHome(); renderNewsListInAdmin(); } }));
+        document.querySelectorAll('.saveNewsEditBtn').forEach(btn => btn.addEventListener('click', () => { 
+            const id = btn.getAttribute('data-id'); 
+            const news = newsDatabase.find(n=>n.id===id); 
+            if(news){ 
+                news.title=document.querySelector(`.edit-news-title[data-id="${id}"]`).value; 
+                news.category=document.querySelector(`.edit-news-category[data-id="${id}"]`).value; 
+                news.excerpt=document.querySelector(`.edit-news-excerpt[data-id="${id}"]`).value; 
+                news.content=document.querySelector(`.edit-news-content[data-id="${id}"]`).value; 
+                news.image=document.querySelector(`.edit-news-image[data-id="${id}"]`).value; 
+                saveNews(); 
+                if(currentView==="home") showHome(); 
+                else if(currentView==="single") showSingleNews(id); 
+                alert("Noticia actualizada"); 
+                renderNewsListInAdmin(); // refrescar lista para mostrar cambios
+            } 
+        }));
+        document.querySelectorAll('.adminDeleteNewsBtn').forEach(btn => btn.addEventListener('click', () => { 
+            if(confirm("Eliminar noticia?")) { 
+                const id = btn.getAttribute('data-id'); 
+                newsDatabase = newsDatabase.filter(n => n.id !== id); 
+                saveNews(); 
+                if(currentView==="home") showHome(); 
+                renderNewsListInAdmin(); 
+            } 
+        }));
     }
     
-    // Carga principal: primero intenta obtener el JSON remoto por defecto (./hackers_data.json)
-    // Si existe, lo usa y actualiza localStorage. Si no, usa localStorage o demo.
     async function loadFromDefaultRemote() {
         try {
             const response = await fetch(DEFAULT_REMOTE_JSON_PATH);
@@ -342,21 +454,19 @@
                 newsDatabase = data.news;
                 if (!siteConfig.categories) siteConfig.categories = ["🏠 PORTADA", "💻 HACKTIVISMO", "😂 SÁTIRA", "🔓 LEAKS", "🤖 IA REBELDE"];
                 saveConfig(); saveNews();
-                document.getElementById('remoteStatusMsg').innerHTML = `✅ Datos cargados desde ${DEFAULT_REMOTE_JSON_PATH} (sincronizados para todos los usuarios).<br>Última carga: ${new Date().toLocaleString()}`;
+                document.getElementById('remoteStatusMsg').innerHTML = `✅ Datos cargados desde ${DEFAULT_REMOTE_JSON_PATH} (sincronizados para todos).<br>Última carga: ${new Date().toLocaleString()}`;
                 return true;
             }
         } catch (err) {
-            console.log("No se pudo cargar el JSON por defecto:", err.message);
-            document.getElementById('remoteStatusMsg').innerHTML = `⚠️ No se encontró ${DEFAULT_REMOTE_JSON_PATH}. Usando datos locales (demo o localStorage).<br>Sube un archivo exportado como 'hackers_data.json' para que todos los visitantes lo vean.`;
+            console.log("No se pudo cargar JSON remoto:", err.message);
+            document.getElementById('remoteStatusMsg').innerHTML = `⚠️ No se encontró ${DEFAULT_REMOTE_JSON_PATH}. Usando datos locales. Sube el archivo a GitHub para compartir.`;
         }
         return false;
     }
     
     async function loadData() {
-        // 1. Intentar cargar desde el JSON por defecto del repositorio (para que todos los usuarios compartan datos)
         const remoteLoaded = await loadFromDefaultRemote();
         if (!remoteLoaded) {
-            // 2. Fallback: localStorage o demo
             const savedConfig = localStorage.getItem(STORAGE_CONFIG);
             if (savedConfig) siteConfig = JSON.parse(savedConfig);
             else saveConfig();
@@ -364,22 +474,9 @@
             if (savedNews) newsDatabase = JSON.parse(savedNews);
             else { newsDatabase = JSON.parse(JSON.stringify(DEFAULT_NEWS)); saveNews(); }
         }
-        // 3. Si existe una URL remota personal guardada (por si el admin quiere probar otra fuente), se puede aplicar pero no es obligatoria.
-        const personalUrl = getSavedRemoteUrl();
-        if (personalUrl && personalUrl !== DEFAULT_REMOTE_JSON_PATH) {
-            const response = await fetch(personalUrl).catch(()=>null);
-            if (response && response.ok) {
-                const data = await response.json();
-                if (data.config && data.news) {
-                    siteConfig = data.config; newsDatabase = data.news;
-                    if (!siteConfig.categories) siteConfig.categories = ["🏠 PORTADA", "💻 HACKTIVISMO", "😂 SÁTIRA", "🔓 LEAKS", "🤖 IA REBELDE"];
-                    saveConfig(); saveNews();
-                    document.getElementById('remoteStatusMsg').innerHTML = `📌 Usando URL personal: ${personalUrl}`;
-                }
-            }
-        }
         applyColors(); applyBranding(); applyFooter(); renderNav(); showHome();
         updateDate();
+        loadGitHubConfig();
     }
     
     function exportData() {
@@ -388,9 +485,9 @@
         const blob = new Blob([dataStr], {type: "application/json"});
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
-        a.href = url; a.download = `hackers_data.json`;  // nombre sugerido para subir a GitHub
+        a.href = url; a.download = `hackers_data.json`;
         document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
-        alert("✅ JSON exportado. Guarda este archivo como 'hackers_data.json' y súbelo a tu repositorio de GitHub (misma carpeta que este HTML).");
+        alert("✅ JSON exportado. Puedes subirlo manualmente a GitHub o usar el botón 'Subir a GitHub ahora'.");
     }
     
     function importData(file) {
@@ -411,29 +508,11 @@
         reader.readAsText(file);
     }
     
-    async function fetchAndApplyRemoteJson(url) {
-        try {
-            const response = await fetch(url);
-            if(!response.ok) throw new Error(`HTTP ${response.status}`);
-            const data = await response.json();
-            if(data.config && data.news && Array.isArray(data.news)) {
-                siteConfig = data.config; newsDatabase = data.news;
-                if(!siteConfig.categories) siteConfig.categories = ["🏠 PORTADA", "💻 HACKTIVISMO", "😂 SÁTIRA", "🔓 LEAKS", "🤖 IA REBELDE"];
-                saveConfig(); saveNews(); saveRemoteUrl(url);
-                applyColors(); applyBranding(); applyFooter(); renderNav(); currentFilter = null; showHome();
-                if(document.getElementById('adminPanel').style.display === 'block') { updateAdminDisplayValues(); renderCategoriesInAdmin(); renderNewsListInAdmin(); }
-                document.getElementById('remoteStatusMsg').innerHTML = `✅ Datos cargados desde URL personal: ${url}`;
-                alert("Datos cargados desde URL externa (solo para tu navegador).");
-                return true;
-            } else throw new Error("Formato inválido");
-        } catch(err) { alert("Error al cargar JSON remoto: "+err.message); return false; }
-    }
-    
     function resetAll() {
         if(confirm("RESET TOTAL: restaurar datos demo y borrar configuración remota.")) {
             siteConfig = { title: "🐱‍👤 HACKERS", subtitle: "periódico satírico · hacktivismo · cultura glitch", footerText: "Hackers News · Sátira digital y crítica social. Ningún gobierno fue vulnerado (quizás).", watermark: "🔐 [editorial]", colors: { headerBg: "#000000dd", accent: "#00ffcc", bodyBg: "#0a0c0f", textColor: "#e0e0e0", cardBg: "#12161f" }, categories: ["🏠 PORTADA", "💻 HACKTIVISMO", "😂 SÁTIRA", "🔓 LEAKS", "🤖 IA REBELDE"] };
             newsDatabase = JSON.parse(JSON.stringify(DEFAULT_NEWS));
-            saveConfig(); saveNews(); localStorage.removeItem(STORAGE_REMOTE_URL);
+            saveConfig(); saveNews();
             applyColors(); applyBranding(); applyFooter(); renderNav(); currentFilter = null; showHome();
             if(document.getElementById('adminPanel').style.display === 'block') { updateAdminDisplayValues(); renderCategoriesInAdmin(); renderNewsListInAdmin(); }
             alert("Todo restablecido a valores originales.");
@@ -454,10 +533,26 @@
         document.getElementById('bodyBgColor').value = siteConfig.colors.bodyBg;
         document.getElementById('textColor').value = siteConfig.colors.textColor;
         document.getElementById('cardBgColor').value = siteConfig.colors.cardBg;
-        document.getElementById('remoteJsonUrl').value = getSavedRemoteUrl() || '';
     }
     
-    function logoutAdmin() { isAdminMode=false; setAdminMode(false); document.getElementById('authSection').style.display='block'; document.getElementById('adminPanel').style.display='none'; document.getElementById('adminPassword').value=''; document.getElementById('loginError').innerText=''; currentFilter=null; renderNav(); showHome(); modal.style.display='none'; alert('Sesión cerrada'); }
+    function refreshAdminPanelData() {
+        if(document.getElementById('adminPanel').style.display === 'block') {
+            updateAdminDisplayValues();
+            renderCategoriesInAdmin();
+            renderNewsListInAdmin();
+        }
+    }
+    
+    function logoutAdmin() { 
+        isAdminMode=false; setAdminMode(false); 
+        document.getElementById('authSection').style.display='block'; 
+        document.getElementById('adminPanel').style.display='none'; 
+        document.getElementById('adminPassword').value=''; 
+        document.getElementById('loginError').innerText=''; 
+        currentFilter=null; renderNav(); showHome(); 
+        modal.style.display='none'; 
+        alert('Sesión cerrada'); 
+    }
     
     function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
     
@@ -465,23 +560,29 @@
     
     // MODAL & EVENTOS
     const modal = document.getElementById('adminModal');
-    document.getElementById('footerSecretHint').onclick = () => { modal.style.display = 'flex'; if(isAdminMode) { document.getElementById('authSection').style.display='none'; document.getElementById('adminPanel').style.display='block'; updateAdminDisplayValues(); renderCategoriesInAdmin(); renderNewsListInAdmin(); } };
+    document.getElementById('footerSecretHint').onclick = () => { modal.style.display = 'flex'; if(isAdminMode) { document.getElementById('authSection').style.display='none'; document.getElementById('adminPanel').style.display='block'; refreshAdminPanelData(); } };
     document.getElementById('closeModalBtn').onclick = () => modal.style.display = 'none';
     window.onclick = (e) => { if(e.target === modal) modal.style.display = 'none'; };
-    document.getElementById('loginBtn').onclick = async () => { if(await sha256(document.getElementById('adminPassword').value) === ADMIN_PASSWORD_HASH) { document.getElementById('authSection').style.display='none'; document.getElementById('adminPanel').style.display='block'; setAdminMode(true); updateAdminDisplayValues(); renderCategoriesInAdmin(); renderNewsListInAdmin(); } else document.getElementById('loginError').innerText="⛔ Clave incorrecta."; };
+    document.getElementById('loginBtn').onclick = async () => { 
+        if(await sha256(document.getElementById('adminPassword').value) === ADMIN_PASSWORD_HASH) { 
+            document.getElementById('authSection').style.display='none'; 
+            document.getElementById('adminPanel').style.display='block'; 
+            setAdminMode(true); 
+            refreshAdminPanelData(); 
+        } else document.getElementById('loginError').innerText="⛔ Clave incorrecta."; 
+    };
     document.getElementById('logoutAdminBtn').onclick = logoutAdmin;
-    document.getElementById('updateBrandBtn').onclick = () => { if(document.getElementById('editTitle').value) siteConfig.title = document.getElementById('editTitle').value; if(document.getElementById('editSubtitle').value) siteConfig.subtitle = document.getElementById('editSubtitle').value; saveConfig(); applyBranding(); updateAdminDisplayValues(); alert("Título actualizado."); };
+    document.getElementById('updateBrandBtn').onclick = () => { if(document.getElementById('editTitle').value) siteConfig.title = document.getElementById('editTitle').value; if(document.getElementById('editSubtitle').value) siteConfig.subtitle = document.getElementById('editSubtitle').value; saveConfig(); applyBranding(); refreshAdminPanelData(); alert("Título actualizado."); };
     document.getElementById('applyColorsBtn').onclick = () => { siteConfig.colors.headerBg = document.getElementById('headerBgColor').value; siteConfig.colors.accent = document.getElementById('accentColor').value; siteConfig.colors.bodyBg = document.getElementById('bodyBgColor').value; siteConfig.colors.textColor = document.getElementById('textColor').value; siteConfig.colors.cardBg = document.getElementById('cardBgColor').value; saveConfig(); applyColors(); if(currentView === "home") showHome(); alert("Colores actualizados."); };
-    document.getElementById('addCategoryBtn').onclick = () => { let newCat = document.getElementById('newCategoryName').value.trim(); if(newCat && !siteConfig.categories.includes(newCat)) { siteConfig.categories.push(newCat); saveConfig(); renderNav(); renderCategoriesInAdmin(); document.getElementById('newCategoryName').value=''; alert("Categoría agregada."); } else alert("Inválida o ya existe"); };
+    document.getElementById('addCategoryBtn').onclick = () => { let newCat = document.getElementById('newCategoryName').value.trim(); if(newCat && !siteConfig.categories.includes(newCat)) { siteConfig.categories.push(newCat); saveConfig(); renderNav(); refreshAdminPanelData(); document.getElementById('newCategoryName').value=''; alert("Categoría agregada."); } else alert("Inválida o ya existe"); };
     document.getElementById('addNewsAdminBtn').onclick = () => { const win = window.open('','newsEditor','width=900,height=800'); win.document.write(`<html><head><title>Nueva noticia</title></head><body style="font-family:Arial;padding:20px"><h2>Nueva noticia</h2><input id="t" placeholder="Título" style="width:100%;margin:5px"><br><select id="c" style="width:100%;margin:5px">${siteConfig.categories.filter(x=>x!=="🏠 PORTADA").map(x=>`<option value="${getCategoryKey(x)}">${x}</option>`).join('')}</select><br><textarea id="e" placeholder="Extracto" style="width:100%;height:80px"></textarea><br><textarea id="co" placeholder="Contenido" style="width:100%;height:200px"></textarea><br><input id="i" placeholder="URL imagen" style="width:100%;margin:5px"><br><button onclick="window.opener.saveNewsFromPopup(document.getElementById('t').value,document.getElementById('c').value,document.getElementById('e').value,document.getElementById('co').value,document.getElementById('i').value)">Guardar</button></body></html>`); };
-    window.saveNewsFromPopup = function(t,c,e,co,i){ if(t&&e){ newsDatabase.unshift({id:Date.now()+''+Math.random(), title:t, category:c, excerpt:e, content:co, image:i, date:new Date().toISOString()}); saveNews(); showHome(); renderNewsListInAdmin(); alert('Noticia agregada'); } };
-    document.getElementById('updateFooterBtn').onclick = () => { if(document.getElementById('editFooterText').value) siteConfig.footerText = document.getElementById('editFooterText').value; if(document.getElementById('editWatermark').value) siteConfig.watermark = document.getElementById('editWatermark').value; saveConfig(); applyFooter(); updateAdminDisplayValues(); alert("Footer actualizado."); };
+    window.saveNewsFromPopup = function(t,c,e,co,i){ if(t&&e){ newsDatabase.unshift({id:Date.now()+''+Math.random(), title:t, category:c, excerpt:e, content:co, image:i, date:new Date().toISOString()}); saveNews(); showHome(); refreshAdminPanelData(); alert('Noticia agregada'); } };
+    document.getElementById('updateFooterBtn').onclick = () => { if(document.getElementById('editFooterText').value) siteConfig.footerText = document.getElementById('editFooterText').value; if(document.getElementById('editWatermark').value) siteConfig.watermark = document.getElementById('editWatermark').value; saveConfig(); applyFooter(); refreshAdminPanelData(); alert("Footer actualizado."); };
     document.getElementById('resetAllBtn').onclick = resetAll;
     document.getElementById('exportDataBtn').onclick = exportData;
     document.getElementById('importFileInput').onchange = (e) => { if(e.target.files[0]) importData(e.target.files[0]); e.target.value=''; };
-    document.getElementById('fetchRemoteDataBtn').onclick = () => { const url = document.getElementById('remoteJsonUrl').value.trim(); if(url) fetchAndApplyRemoteJson(url); else alert("Introduce una URL válida (raw de GitHub)"); };
-    document.getElementById('clearRemoteSourceBtn').onclick = () => { localStorage.removeItem(STORAGE_REMOTE_URL); saveRemoteUrl(''); document.getElementById('remoteJsonUrl').value=''; document.getElementById('remoteStatusMsg').innerHTML='🧹 URL personal olvidada. Ahora usas el JSON por defecto si existe.'; alert("Fuente personal eliminada."); };
-    document.getElementById('syncInstructionsBtn').onclick = () => { alert("📘 GUÍA PARA COMPARTIR DATOS ACTUALIZADOS:\n1. En el panel, haz clic en 'Exportar JSON' → se descargará 'hackers_data.json'.\n2. Sube ese archivo a tu repositorio de GitHub (en la misma carpeta donde está este HTML).\n3. Si usas GitHub Pages, todos los visitantes verán automáticamente los datos actualizados al cargar la página.\n4. Si quieres otra ubicación, cambia la constante DEFAULT_REMOTE_JSON_PATH en el código."); };
+    document.getElementById('saveGitHubConfigBtn').onclick = saveGitHubConfigToLocal;
+    document.getElementById('pushToGitHubBtn').onclick = uploadToGitHub;
     
     loadData();
     window.addEventListener('hashchange', () => { const hash=window.location.hash; if(hash.startsWith('#news-')) showSingleNews(hash.replace('#news-','')); else if(currentView==="single") showHome(); });
