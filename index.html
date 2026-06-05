@@ -473,6 +473,10 @@
         currentView = "single";
         const mainContent = document.getElementById('mainContent');
         mainContent.innerHTML = `<div class="single-news"><div class="single-news-img" style="background-image: url('${article.image || 'https://picsum.photos/id/13/900/400'}');"></div><div class="single-news-content"><div class="single-news-category">${escapeHtml(article.category)}</div><h1 class="single-news-title">${escapeHtml(article.title)}</h1><div class="single-news-meta">📅 ${new Date(article.date).toLocaleDateString()}</div><div class="single-news-body">${escapeHtml(article.content || article.excerpt)}</div><button class="share-news-btn" data-id="${article.id}">📤 Compartir noticia</button><br><a href="#" class="back-home back-home-btn" id="backHomeBtn">← Volver al inicio</a></div></div>`;
+        
+        // ✅ Forzar scroll hacia arriba al abrir la noticia
+        window.scrollTo(0, 0);
+        
         document.getElementById('backHomeBtn')?.addEventListener('click', (e) => { e.preventDefault(); showHome(); });
         document.querySelector('.share-news-btn')?.addEventListener('click', async () => { 
             const shareUrl = window.location.origin + window.location.pathname + '#news-'+article.id; 
