@@ -20,6 +20,15 @@
   },
   "news": [
     {
+      "id": "17807475772560.12395424265615229",
+      "title": "Google y FBI alertan sobre hackers que se infiltran como soporte técnico en bufetes de abogados",
+      "category": "HACKTIVISMO",
+      "excerpt": "Google y el FBI emitieron una alerta conjunta sobre el grupo Silent Ransom, que ha innovado sus tácticas de extorsión enviando a falsos trabajadores de soporte técnico directamente a las oficinas de bufetes de abogados para robar información confidencial mediante unidades USB o acceso remoto.",
+      "content": "Google y el FBI emitieron una alerta conjunta sobre el grupo Silent Ransom, que ha innovado sus tácticas de extorsión enviando a falsos trabajadores de soporte técnico directamente a las oficinas de bufetes de abogados para robar información confidencial mediante unidades USB o acceso remoto.\n\nEl grupo Silent Ransom intensificó ataques contra bufetes de abogados usando infiltrados físicos que se hacían pasar por empleados de soporte de TI para conectar unidades USB y herramientas de acceso remoto.\n\nGoogle Mandiant y el FBI confirmaron múltiples casos entre enero y mayo de 2026 donde los impostores robaron contratos, números de seguro social y registros financieros directamente de las computadoras.\n\nLa táctica híbrida combina ingeniería social tradicional por teléfono con intrusiones físicas, para luego amenazar a las víctimas con publicar los datos robados en su propio sitio de filtración si no pagan el rescate.",
+      "image": "https://images2.imgbox.com/45/a2/C1MgORhY_o.jpg",
+      "date": "2026-06-06T12:06:17.256Z"
+    },
+    {
       "id": "17805822412090.1274198068299015",
       "title": "Operadores de 0800 Extorsión empiezan a cobrar vacuna a los que llamen",
       "category": "NACIONALES",
@@ -102,5 +111,5 @@
     }
   ],
   "version": "1.0",
-  "exportDate": "2026-06-04T14:11:35.721Z"
+  "exportDate": "2026-06-06T12:07:38.590Z"
 }
