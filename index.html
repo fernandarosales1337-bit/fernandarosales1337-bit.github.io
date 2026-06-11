@@ -351,7 +351,16 @@
         mainContent.innerHTML = `<div class="single-news"><div class="single-news-img" style="background-image: url('${article.image || 'https://picsum.photos/id/13/900/400'}');"></div><div class="single-news-content"><div class="single-news-category">${escapeHtml(article.category)}</div><h1 class="single-news-title">${escapeHtml(article.title)}</h1><div class="single-news-meta">📅 ${new Date(article.date).toLocaleDateString()}</div><div class="single-news-body">${escapeHtml(article.content || article.excerpt)}</div><button class="share-news-btn" data-id="${article.id}">📤 Compartir noticia</button><br><a href="#" class="back-home back-home-btn" id="backHomeBtn">← Volver al inicio</a></div></div>`;
         window.scrollTo(0, 0);
         document.getElementById('backHomeBtn')?.addEventListener('click', (e) => { e.preventDefault(); showHome(); });
-        document.querySelector('.share-news-btn')?.addEventListener('click', async () => { const shareUrl = window.location.origin + window.location.pathname + '#news-'+article.id; try { await navigator.clipboard.writeText(shareUrl); alert('✅ Enlace copiado'); } catch(e) { prompt('Copia el enlace:', shareUrl); } });
+        // ✅ Botón de compartir corregido como en el primer archivo
+        document.querySelector('.share-news-btn')?.addEventListener('click', async () => { 
+            const shareUrl = window.location.origin + window.location.pathname + '#news-'+article.id; 
+            try { 
+                await navigator.clipboard.writeText(shareUrl); 
+                alert('✅ Enlace copiado'); 
+            } catch(e) { 
+                prompt('Copia el enlace:', shareUrl); 
+            } 
+        });
     }
     
     function renderCategoriesInAdmin() { document.getElementById('categoriesList').innerHTML = siteConfig.categories.map(c => `<span style="background:#2a3a4a;padding:4px 12px;border-radius:40px;display:inline-block;margin:4px;">${c}</span>`).join(' '); }
