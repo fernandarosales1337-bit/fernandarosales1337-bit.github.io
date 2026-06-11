@@ -251,7 +251,9 @@
     
     const DEFAULT_NEWS = [
         { id: "1", title: "Anonymous libera los correos del Yeti del Himalaya: 'Exigimos nieve libre de DRM'", category: "Hacktivismo", excerpt: "En un comunicado difundido mediante memes, el colectivo asegura que el críptido tiene derecho a la privacidad, pero sus servidores fueron vulnerados por usar '123456' como contraseña.", content: "Tras semanas de investigación, Anonymous publicó más de 3GB de selfies del Yeti. El gobierno nepalí lo calificó como 'fake news'. Sin embargo, el Yeti tuiteó 'Estoy enojado, pero el chiste es bueno' desde una cuenta verificada. La comunidad hacker celebra mientras el Himalaya refuerza sus servidores.", image: "https://picsum.photos/id/104/400/220", date: new Date().toISOString() },
-        { id: "2", title: "Ministro de Ciberseguridad usa 'admin/admin' en portal nuclear; Hackers crean meme eterno", category: "Sátira", excerpt: "La filtración llegó tras un CTF universitario. El funcionario asegura que 'era un honeypot'. Nadie le cree. El incidente ya tiene su propio NFT conmemorativo.", content: "El famoso caso 'admin/admin' recorrió el mundo. La oposición pide explicaciones, mientras el ministro declaró que su contraseña real es 'elcarnetrindeconejo'. El meme ya se ha compartido más de 2 millones de veces.", image: "https://picsum.photos/id/106/400/220", date: new Date().toISOString() }
+        { id: "2", title: "Ministro de Ciberseguridad usa 'admin/admin' en portal nuclear; Hackers crean meme eterno", category: "Sátira", excerpt: "La filtración llegó tras un CTF universitario. El funcionario asegura que 'era un honeypot'. Nadie le cree. El incidente ya tiene su propio NFT conmemorativo.", content: "El famoso caso 'admin/admin' recorrió el mundo. La oposición pide explicaciones, mientras el ministro declaró que su contraseña real es 'elcarnetrindeconejo'. El meme ya se ha compartido más de 2 millones de veces.", image: "https://picsum.photos/id/106/400/220", date: new Date().toISOString() },
+        { id: "3", title: "Hacker ético '4chan' desactiva la IA del gobierno por recomendar recetas de pizza con piña", category: "IA rebelde", excerpt: "El ataque masivo de 'denial-of-taste' provocó que la inteligencia artificial se reiniciara a Windows XP. Expertos debaten: 'la piña en pizza es delito de lesa humanidad'.", content: "La noticia satírica arrasa en redes. La Unión Europea estudia sancionar la piña en la pizza a nivel digital. El hacker, bajo el seudónimo 'PineappleH4ter', no ha sido identificado.", image: "https://picsum.photos/id/22/400/220", date: new Date().toISOString() },
+        { id: "4", title: "Filtran plan secreto para instalar Linux en electrodomésticos: la nevera hará 'sudo apt-get destroy'", category: "Leaks", excerpt: "Documentos internos de una multinacional muestran su intención de 'open sourcear' la lavadora. La OMS advierte sobre riesgo de que la tostadora ejecute ransomware.", content: "La comunidad de software libre celebra, pero con escepticismo. Mientras tanto, una nevera inteligente fue vista minando criptomonedas.", image: "https://picsum.photos/id/0/400/220", date: new Date().toISOString() }
     ];
     
     let isAdminMode = false;
@@ -265,7 +267,6 @@
     function loadGitHubConfig() { const saved = localStorage.getItem(STORAGE_GITHUB); if(saved) { const cfg = JSON.parse(saved); document.getElementById('githubToken').value = cfg.token || ''; document.getElementById('githubRepo').value = cfg.repo || ''; document.getElementById('githubFilePath').value = cfg.filePath || 'hackers_data.json'; } }
     function saveGitHubConfigToLocal() { const cfg = { token: document.getElementById('githubToken').value.trim(), repo: document.getElementById('githubRepo').value.trim(), filePath: document.getElementById('githubFilePath').value.trim() }; if(cfg.token && cfg.repo && cfg.filePath) { localStorage.setItem(STORAGE_GITHUB, JSON.stringify(cfg)); alert("Configuración guardada."); } else alert("Completa todos los campos."); }
     
-    // Subir imagen individual a GitHub
     async function uploadImageToGitHub(file) {
         const token = document.getElementById('githubToken').value.trim();
         const repo = document.getElementById('githubRepo').value.trim();
@@ -329,18 +330,28 @@
         document.querySelectorAll('.delete-cat-btn').forEach(btn => { btn.addEventListener('click', (e) => { e.stopPropagation(); const catToDelete = btn.getAttribute('data-cat'); if (catToDelete === "🏠 PORTADA") return alert("No se puede eliminar portada."); if(confirm(`¿Eliminar categoría "${catToDelete}"?`)) { siteConfig.categories = siteConfig.categories.filter(c => c !== catToDelete); saveConfig(); renderNav(); if(document.getElementById('adminPanel').style.display === 'block') renderCategoriesInAdmin(); if(currentFilter && getCategoryKey(catToDelete) === currentFilter) currentFilter = null; if(currentView === "home") showHome(); } }); });
     }
     
-    function showHome() {
-        currentView = "home";
-        const mainContent = document.getElementById('mainContent');
-        if (!document.getElementById('newsContainer')) mainContent.innerHTML = '<div id="newsContainer" class="news-grid"></div>';
+    function renderNews() {
         let filtered = [...newsDatabase].sort((a,b)=>new Date(b.date)-new Date(a.date));
         if(currentFilter) filtered = filtered.filter(n => (n.category||'').toLowerCase().trim() === (currentFilter||'').toLowerCase().trim());
         const container = document.getElementById('newsContainer');
+        if(!container) return;
         if(filtered.length === 0) { container.innerHTML = "<div style='grid-column:1/-1;text-align:center;padding:60px;'>📭 No hay noticias en esta categoría. ¡Agrega desde el panel editorial!</div>"; return; }
         container.innerHTML = filtered.map(article => `<div class="news-card" data-id="${article.id}"><button class="delete-news-btn admin-only" data-id="${article.id}" title="Eliminar noticia">🗑️</button><div class="card-img" style="background-image: url('${article.image || 'https://picsum.photos/id/13/400/220'}');"><span class="card-category">${escapeHtml(article.category)}</span></div><div class="card-content"><h2 class="card-title">${escapeHtml(article.title)}</h2><div class="card-meta"><span>📅 ${new Date(article.date).toLocaleDateString()}</span><span>🔮 ${escapeHtml(article.category)}</span></div><p class="card-excerpt">${escapeHtml(article.excerpt.length > 140 ? article.excerpt.substring(0,140)+'…' : article.excerpt)}</p><a class="read-more" data-id="${article.id}">Leer noticia completa →</a></div></div>`).join('');
-        document.querySelectorAll('.delete-news-btn').forEach(btn => btn.addEventListener('click', (e) => { e.stopPropagation(); const id = btn.getAttribute('data-id'); if(confirm("Eliminar?")) { newsDatabase = newsDatabase.filter(n => n.id !== id); saveNews(); showHome(); if(document.getElementById('adminPanel').style.display === 'block') renderNewsListInAdmin(); } }));
-        document.querySelectorAll('.read-more').forEach(link => link.addEventListener('click', (e) => { e.preventDefault(); showSingleNews(link.getAttribute('data-id')); }));
+        
+        document.querySelectorAll('.delete-news-btn').forEach(btn => btn.addEventListener('click', (e) => { e.stopPropagation(); const id = btn.getAttribute('data-id'); if(confirm("Eliminar?")) { newsDatabase = newsDatabase.filter(n => n.id !== id); saveNews(); renderNews(); if(document.getElementById('adminPanel').style.display === 'block') renderNewsListInAdmin(); } }));
+        
+        document.querySelectorAll('.read-more').forEach(link => link.addEventListener('click', (e) => { e.preventDefault(); const id = link.getAttribute('data-id'); showSingleNews(id); }));
+        
         document.querySelectorAll('.news-card').forEach(card => card.style.backgroundColor = siteConfig.colors.cardBg);
+        document.querySelectorAll('.card-category').forEach(cat => cat.style.backgroundColor = siteConfig.colors.accent + "dd");
+    }
+    
+    function showHome() {
+        currentView = "home";
+        const mainContent = document.getElementById('mainContent');
+        mainContent.innerHTML = '<div id="newsContainer" class="news-grid"></div>';
+        renderNews();
+        if (window.location.hash) history.pushState(null, '', window.location.pathname + window.location.search);
     }
     
     function showSingleNews(id) {
@@ -349,9 +360,11 @@
         currentView = "single";
         const mainContent = document.getElementById('mainContent');
         mainContent.innerHTML = `<div class="single-news"><div class="single-news-img" style="background-image: url('${article.image || 'https://picsum.photos/id/13/900/400'}');"></div><div class="single-news-content"><div class="single-news-category">${escapeHtml(article.category)}</div><h1 class="single-news-title">${escapeHtml(article.title)}</h1><div class="single-news-meta">📅 ${new Date(article.date).toLocaleDateString()}</div><div class="single-news-body">${escapeHtml(article.content || article.excerpt)}</div><button class="share-news-btn" data-id="${article.id}">📤 Compartir noticia</button><br><a href="#" class="back-home back-home-btn" id="backHomeBtn">← Volver al inicio</a></div></div>`;
+        
         window.scrollTo(0, 0);
+        
         document.getElementById('backHomeBtn')?.addEventListener('click', (e) => { e.preventDefault(); showHome(); });
-        // ✅ Botón de compartir corregido como en el primer archivo
+        
         document.querySelector('.share-news-btn')?.addEventListener('click', async () => { 
             const shareUrl = window.location.origin + window.location.pathname + '#news-'+article.id; 
             try { 
@@ -361,14 +374,16 @@
                 prompt('Copia el enlace:', shareUrl); 
             } 
         });
+        
+        if (window.location.hash !== '#news-'+id) history.pushState(null, '', '#news-'+id);
     }
     
     function renderCategoriesInAdmin() { document.getElementById('categoriesList').innerHTML = siteConfig.categories.map(c => `<span style="background:#2a3a4a;padding:4px 12px;border-radius:40px;display:inline-block;margin:4px;">${c}</span>`).join(' '); }
     function renderNewsListInAdmin() {
         const div = document.getElementById('newsListAdmin');
         div.innerHTML = newsDatabase.map(n => `<div style="margin:12px 0;background:#0f1219;padding:14px;border-radius:12px;border:1px solid #2a3a4a;"><input type="text" class="edit-news-title" data-id="${n.id}" value="${escapeHtml(n.title)}" style="margin-bottom:8px;"><select class="edit-news-category" data-id="${n.id}" style="margin-bottom:8px;">${siteConfig.categories.filter(c=>c!=="🏠 PORTADA").map(c=>`<option value="${getCategoryKey(c)}" ${n.category===getCategoryKey(c)?'selected':''}>${c}</option>`).join('')}</select><textarea class="edit-news-excerpt" data-id="${n.id}" style="margin-bottom:8px;">${escapeHtml(n.excerpt)}</textarea><textarea class="edit-news-content" data-id="${n.id}" style="margin-bottom:8px;">${escapeHtml(n.content || '')}</textarea><input type="text" class="edit-news-image" data-id="${n.id}" value="${escapeHtml(n.image || '')}" placeholder="URL de imagen" style="margin-bottom:10px;"><div><button class="insertImageUrlBtn" data-id="${n.id}" style="background:#ffaa33;">🖼️ Usar última imagen subida</button></div><div style="display:flex;gap:10px;margin-top:10px;"><button class="saveNewsEditBtn" data-id="${n.id}" style="background:#00cc88;">💾 Guardar</button><button class="adminDeleteNewsBtn" data-id="${n.id}" style="background:#ff4444;">🗑️ Eliminar</button></div></div>`).join('');
-        document.querySelectorAll('.saveNewsEditBtn').forEach(btn => btn.addEventListener('click', () => { const id = btn.getAttribute('data-id'); const news = newsDatabase.find(n=>n.id===id); if(news){ news.title=document.querySelector(`.edit-news-title[data-id="${id}"]`).value; news.category=document.querySelector(`.edit-news-category[data-id="${id}"]`).value; news.excerpt=document.querySelector(`.edit-news-excerpt[data-id="${id}"]`).value; news.content=document.querySelector(`.edit-news-content[data-id="${id}"]`).value; news.image=document.querySelector(`.edit-news-image[data-id="${id}"]`).value; saveNews(); if(currentView==="home") showHome(); alert("Noticia actualizada"); renderNewsListInAdmin(); } }));
-        document.querySelectorAll('.adminDeleteNewsBtn').forEach(btn => btn.addEventListener('click', () => { if(confirm("Eliminar noticia?")) { const id = btn.getAttribute('data-id'); newsDatabase = newsDatabase.filter(n => n.id !== id); saveNews(); if(currentView==="home") showHome(); renderNewsListInAdmin(); } }));
+        document.querySelectorAll('.saveNewsEditBtn').forEach(btn => btn.addEventListener('click', () => { const id = btn.getAttribute('data-id'); const news = newsDatabase.find(n=>n.id===id); if(news){ news.title=document.querySelector(`.edit-news-title[data-id="${id}"]`).value; news.category=document.querySelector(`.edit-news-category[data-id="${id}"]`).value; news.excerpt=document.querySelector(`.edit-news-excerpt[data-id="${id}"]`).value; news.content=document.querySelector(`.edit-news-content[data-id="${id}"]`).value; news.image=document.querySelector(`.edit-news-image[data-id="${id}"]`).value; saveNews(); if(currentView==="home") renderNews(); alert("Noticia actualizada"); renderNewsListInAdmin(); } }));
+        document.querySelectorAll('.adminDeleteNewsBtn').forEach(btn => btn.addEventListener('click', () => { if(confirm("Eliminar noticia?")) { const id = btn.getAttribute('data-id'); newsDatabase = newsDatabase.filter(n => n.id !== id); saveNews(); if(currentView==="home") renderNews(); renderNewsListInAdmin(); } }));
         document.querySelectorAll('.insertImageUrlBtn').forEach(btn => { btn.addEventListener('click', () => { const lastImageUrl = localStorage.getItem('lastUploadedImageUrl'); if(lastImageUrl) { document.querySelector(`.edit-news-image[data-id="${btn.getAttribute('data-id')}"]`).value = lastImageUrl; alert("URL insertada"); } else alert("Aún no has subido ninguna imagen. Usa el área de subida primero."); }); });
     }
     
@@ -408,7 +423,7 @@
     document.getElementById('loginBtn').onclick = async () => { if(await sha256(document.getElementById('adminPassword').value) === ADMIN_PASSWORD_HASH) { forceReloadAdminData(); document.getElementById('authSection').style.display='none'; document.getElementById('adminPanel').style.display='block'; setAdminMode(true); forceReloadAdminData(); } else { document.getElementById('loginError').innerText="⛔ Clave incorrecta."; } };
     document.getElementById('logoutAdminBtn').onclick = logoutAdmin;
     document.getElementById('updateBrandBtn').onclick = () => { if(document.getElementById('editTitle').value) siteConfig.title = document.getElementById('editTitle').value; if(document.getElementById('editSubtitle').value) siteConfig.subtitle = document.getElementById('editSubtitle').value; saveConfig(); applyBranding(); refreshAdminPanelData(); alert("Título actualizado."); };
-    document.getElementById('applyColorsBtn').onclick = () => { siteConfig.colors.headerBg = document.getElementById('headerBgColor').value; siteConfig.colors.accent = document.getElementById('accentColor').value; siteConfig.colors.bodyBg = document.getElementById('bodyBgColor').value; siteConfig.colors.textColor = document.getElementById('textColor').value; siteConfig.colors.cardBg = document.getElementById('cardBgColor').value; saveConfig(); applyColors(); if(currentView === "home") showHome(); alert("Colores actualizados."); };
+    document.getElementById('applyColorsBtn').onclick = () => { siteConfig.colors.headerBg = document.getElementById('headerBgColor').value; siteConfig.colors.accent = document.getElementById('accentColor').value; siteConfig.colors.bodyBg = document.getElementById('bodyBgColor').value; siteConfig.colors.textColor = document.getElementById('textColor').value; siteConfig.colors.cardBg = document.getElementById('cardBgColor').value; saveConfig(); applyColors(); if(currentView === "home") renderNews(); alert("Colores actualizados."); };
     document.getElementById('addCategoryBtn').onclick = () => { let newCat = document.getElementById('newCategoryName').value.trim(); if(newCat && !siteConfig.categories.includes(newCat)) { siteConfig.categories.push(newCat); saveConfig(); renderNav(); refreshAdminPanelData(); document.getElementById('newCategoryName').value=''; alert("Categoría agregada."); } else alert("Inválida o ya existe"); };
     document.getElementById('addNewsAdminBtn').onclick = () => { const win = window.open('','newsEditor','width=900,height=800'); win.document.write(`<html><head><title>Nueva noticia</title></head><body style="font-family:Arial;padding:20px"><h2>Nueva noticia</h2><input id="t" placeholder="Título" style="width:100%;margin:5px"><br><select id="c" style="width:100%;margin:5px">${siteConfig.categories.filter(x=>x!=="🏠 PORTADA").map(x=>`<option value="${getCategoryKey(x)}">${x}</option>`).join('')}</select><br><textarea id="e" placeholder="Extracto" style="width:100%;height:80px"></textarea><br><textarea id="co" placeholder="Contenido" style="width:100%;height:200px"></textarea><br><input id="i" placeholder="URL imagen (puedes usar la que subiste)" style="width:100%;margin:5px"><br><button onclick="window.opener.saveNewsFromPopup(document.getElementById('t').value,document.getElementById('c').value,document.getElementById('e').value,document.getElementById('co').value,document.getElementById('i').value)">Guardar</button></body></html>`); };
     window.saveNewsFromPopup = function(t,c,e,co,i){ if(t&&e){ newsDatabase.unshift({id:Date.now()+''+Math.random(), title:t, category:c, excerpt:e, content:co, image:i, date:new Date().toISOString()}); saveNews(); showHome(); refreshAdminPanelData(); alert('Noticia agregada'); } };
