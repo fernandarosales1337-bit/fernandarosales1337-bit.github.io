@@ -20,6 +20,15 @@
   },
   "news": [
     {
+      "id": "17823037335160.8533988449833777",
+      "title": "Caos digital PlanetAsk sufre ataque Cibernético",
+      "category": "HACKTIVISMO",
+      "excerpt": "La red social de preguntas y respuestas vivió ayer horas de incertidumbre y desesperación. Un ataque cibernético perpetrado por el hacker conocido como Psychopathz derribó la plataforma durante varias horas, degradando un disco SSD M2 donde se alojaba la web y obligando a su proveedor, Hostinger, a reemplazar la unidad de emergencia.",
+      "content": "La red social de preguntas y respuestas vivió ayer horas de incertidumbre y desesperación. Un ataque cibernético perpetrado por el hacker conocido como Psychopathz derribó la plataforma durante varias horas, degradando un disco SSD M2 donde se alojaba la web y obligando a su proveedor, Hostinger, a reemplazar la unidad de emergencia.\n\nEl incidente comenzó al mediodía, cuando los usuarios comenzaron a reportar caídas intermitentes y tiempos de carga excesivos. Pronto, la plataforma quedó completamente inaccesible. Los intentos de restauración se toparon con una sorpresa técnica: el disco SSD M2 que contenía los archivos críticos de PlanetAsk y otras webs había sufrido una degradación severa por un ataque dirigido.\n\nLos especialistas de Hostinger actuaron rápidamente para reemplazar el almacenamiento dañado, pero durante horas, el sitio permaneció en un limbo digital. Mientras los ingenieros trabajaban contrarreloj, la comunidad se volcó a otras redes para expresar su angustia.\n\nLo más escalofriante llegó durante la investigación forense. En las FootPrints digitales del ataque, Psychopathz dejó una huella deliberada: un mensaje críptico que heló la sangre de los administradores: \"Un regalito más para ustedes, soy un psicópata, ustedes saben\".\n\nEl alias no es nuevo en el ecosistema de plataformas de preguntas y respuestas. Fuentes cercanas a la seguridad informática señalan que Psychopathz tiene un historial documentado de ataques a sitios Ask, especializándose en vulnerar este tipo de comunidades. Su modus operandi parece ser la provocación y el caos, dejando siempre una firma que oscila entre la amenaza velada y el juego macabro.\n\nMientras el servidor sufría, en los foros y grupos alternativos, los usuarios de PlanetAsk activaron su último recurso: la esperanza depositada en Gdev, el mítico programador que ha revolucionado la plataforma con sus funciones ocultas. Publicaciones como \"Gdev, salvanos\" y \"Si alguien puede arreglar esto, es el astronauta programador\" inundaron las redes.\n\nEntre el alivio y la preocupación, los usuarios de PlanetAsk han convertido el incidente en un tema de conversación masivo. Algunos lo toman con humor: Teodardo, el usuario venezolano que sufre cortes de luz, bromeó: \"Hasta mi conexión es más estable que el servidor de ayer. Pero bueno creo que ya estamos a salvo\".\n",
+      "image": "https://images2.imgbox.com/dc/6b/WnHnoIGB_o.jpg",
+      "date": "2026-06-24T12:22:13.516Z"
+    },
+    {
       "id": "17822180534610.7865163858126611",
       "title": "Chavista exige recuperar la soberanía para volver a ser colonia cubana",
       "category": "NACIONALES",
@@ -165,5 +174,5 @@
     }
   ],
   "version": "1.0",
-  "exportDate": "2026-06-23T12:36:38.441Z"
+  "exportDate": "2026-06-24T12:29:41.339Z"
 }
